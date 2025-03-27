@@ -30,6 +30,26 @@ export class User extends Entity<UserProps> {
     return this.props.avatarId
   }
 
+  set name(name: string) {
+    this.props.name = name
+  }
+
+  set email(email: string) {
+    this.props.email = email
+  }
+
+  set phone(phone: string) {
+    this.props.phone = phone
+  }
+
+  set password(password: string) {
+    this.props.password = password
+  }
+
+  set avatarId(avatarId: string) {
+    this.props.avatarId = avatarId
+  }
+
   static create(props: UserProps, id?: UniqueEntityID) {
     const user = new User(props, id)
 

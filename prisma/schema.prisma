@@ -11,7 +11,7 @@ datasource db {
 }
 
 model User {
-  id       String  @id
+  id       String  @id @default(uuid())
   name     String
   email    String  @unique
   phone    String  @unique
@@ -26,7 +26,7 @@ model User {
 }
 
 model Attachment {
-  id   String @id
+  id   String @id @default(uuid())
   path String
 
   users    User[]
@@ -36,7 +36,7 @@ model Attachment {
 }
 
 model Category {
-  id    String @id
+  id    String @id @default(uuid())
   title String
   slug  String @unique
 
@@ -46,7 +46,7 @@ model Category {
 }
 
 model Product {
-  id           String   @id
+  id           String   @id @default(uuid())
   ownerId      String   @map("owner_id")
   title        String
   description  String
@@ -64,7 +64,7 @@ model Product {
 }
 
 model View {
-  id        String   @id
+  id        String   @id @default(uuid())
   viewerId  String   @map("viewer_id")
   productId String   @map("product_id")
   createdAt DateTime @default(now()) @map("created_at")
