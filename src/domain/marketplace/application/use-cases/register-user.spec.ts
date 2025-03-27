@@ -1,18 +1,18 @@
-import { InMemoryUsersRepository } from 'test/repositories/in-memory-user-repository'
-import { RegisterUserUseCase } from './register-user'
+import { InMemorySellersRepository } from 'test/repositories/in-memory-user-repository'
+import { RegisterSellerUseCase } from './register-seller'
 import { FakeHasher } from 'test/cryptography/fake-hasher'
 
-let inMemoryUsersRepository: InMemoryUsersRepository
+let inMemorySellersRepository: InMemorySellersRepository
 let fakeHasher: FakeHasher
 
-let sut: RegisterUserUseCase
+let sut: RegisterSellerUseCase
 
 describe('Register User', () => {
   beforeEach(() => {
-    inMemoryUsersRepository = new InMemoryUsersRepository()
+    inMemorySellersRepository = new InMemorySellersRepository()
     fakeHasher = new FakeHasher()
 
-    sut = new RegisterUserUseCase(inMemoryUsersRepository, fakeHasher)
+    sut = new RegisterSellerUseCase(inMemorySellersRepository, fakeHasher)
   })
 
   it('should be able to register a new user', async () => {
@@ -26,7 +26,7 @@ describe('Register User', () => {
 
     expect(result.isRight()).toBe(true)
     expect(result.value).toEqual({
-      user: inMemoryUsersRepository.items[0],
+      user: inMemorySellersRepository.items[0],
     })
   })
 
@@ -42,6 +42,6 @@ describe('Register User', () => {
     const hashedPassword = await fakeHasher.hash('123456')
 
     expect(result.isRight()).toBe(true)
-    expect(inMemoryUsersRepository.items[0].password).toEqual(hashedPassword)
+    expect(inMemorySellersRepository.items[0].password).toEqual(hashedPassword)
   })
 })

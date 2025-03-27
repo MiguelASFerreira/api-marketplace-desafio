@@ -1,13 +1,16 @@
 import { faker } from '@faker-js/faker'
 
 import { UniqueEntityID } from '@/core/entities/unique-entity-id'
-import { User, UserProps } from '@/domain/marketplace/enterprise/entities/user'
+import {
+  Seller,
+  SellerProps,
+} from '@/domain/marketplace/enterprise/entities/seller'
 
-export function makeUser(
-  override: Partial<UserProps> = {},
+export function makeSeller(
+  override: Partial<SellerProps> = {},
   id?: UniqueEntityID,
 ) {
-  const user = User.create(
+  const seller = Seller.create(
     {
       name: faker.person.fullName(),
       email: faker.internet.email(),
@@ -19,5 +22,5 @@ export function makeUser(
     id,
   )
 
-  return user
+  return seller
 }

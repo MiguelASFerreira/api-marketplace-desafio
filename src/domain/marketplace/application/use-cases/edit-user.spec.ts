@@ -1,28 +1,28 @@
-import { InMemoryUsersRepository } from 'test/repositories/in-memory-user-repository'
+import { InMemorySellersRepository } from 'test/repositories/in-memory-user-repository'
 import { FakeHasher } from 'test/cryptography/fake-hasher'
-import { EditUserUseCase } from './edit-user'
-import { makeUser } from 'test/factories/make-user'
+import { EditSellerUseCase } from './edit-user'
+import { makeSeller } from 'test/factories/make-seller'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 
-let inMemoryUsersRepository: InMemoryUsersRepository
+let inMemorySellersRepository: InMemorySellersRepository
 let fakeHasher: FakeHasher
-let sut: EditUserUseCase
+let sut: EditSellerUseCase
 
 describe('Edit User', () => {
   beforeEach(() => {
-    inMemoryUsersRepository = new InMemoryUsersRepository()
+    inMemorySellersRepository = new InMemorySellersRepository()
     fakeHasher = new FakeHasher()
 
-    sut = new EditUserUseCase(inMemoryUsersRepository, fakeHasher)
+    sut = new EditSellerUseCase(inMemorySellersRepository, fakeHasher)
   })
 
   it('should be able to register and change a user', async () => {
-    const newUser = makeUser({}, new UniqueEntityID('user-1'))
+    const newUser = makeSeller({}, new UniqueEntityID('user-1'))
 
-    await inMemoryUsersRepository.create(newUser)
+    await inMemorySellersRepository.create(newUser)
 
     await sut.execute({
-      userId: 'user-1',
+      sellerId: 'user-1',
       name: 'John Doe',
       email: 'johndoe@example.com',
       password: '123456',
@@ -30,7 +30,7 @@ describe('Edit User', () => {
       phone: '123456789',
     })
 
-    expect(inMemoryUsersRepository.items[0]).toMatchObject({
+    expect(inMemorySellersRepository.items[0]).toMatchObject({
       name: 'John Doe',
       email: 'johndoe@example.com',
       password: '123456-hashed',

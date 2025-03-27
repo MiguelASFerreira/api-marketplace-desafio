@@ -1,46 +1,46 @@
-import { UserRepository } from '@/domain/marketplace/application/repositories/user-repository'
-import { User } from '@/domain/marketplace/enterprise/entities/user'
+import { SellerRepository } from '@/domain/marketplace/application/repositories/seller-repository'
+import { Seller } from '@/domain/marketplace/enterprise/entities/seller'
 
-export class InMemoryUsersRepository implements UserRepository {
-  public items: User[] = []
+export class InMemorySellersRepository implements SellerRepository {
+  public items: Seller[] = []
 
   async findById(id: string) {
-    const user = this.items.find((item) => item.id.toString() === id)
+    const seller = this.items.find((item) => item.id.toString() === id)
 
-    if (!user) {
+    if (!seller) {
       return null
     }
 
-    return user
+    return seller
   }
 
   async findByEmail(email: string) {
-    const user = this.items.find((item) => item.email === email)
+    const seller = this.items.find((item) => item.email === email)
 
-    if (!user) {
+    if (!seller) {
       return null
     }
 
-    return user
+    return seller
   }
 
   async findByPhone(phone: string) {
-    const user = this.items.find((item) => item.phone === phone)
+    const seller = this.items.find((item) => item.phone === phone)
 
-    if (!user) {
+    if (!seller) {
       return null
     }
 
-    return user
+    return seller
   }
 
-  async save(user: User) {
-    const itemIndex = this.items.findIndex((item) => item.id === user.id)
+  async save(seller: Seller) {
+    const itemIndex = this.items.findIndex((item) => item.id === seller.id)
 
-    this.items[itemIndex] = user
+    this.items[itemIndex] = seller
   }
 
-  async create(user: User) {
-    this.items.push(user)
+  async create(seller: Seller) {
+    this.items.push(seller)
   }
 }

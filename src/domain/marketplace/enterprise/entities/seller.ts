@@ -1,7 +1,7 @@
 import { Entity } from '@/core/entities/entity'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 
-export interface UserProps {
+export interface SellerProps {
   name: string
   email: string
   phone: string
@@ -9,7 +9,7 @@ export interface UserProps {
   avatarId: string
 }
 
-export class User extends Entity<UserProps> {
+export class Seller extends Entity<SellerProps> {
   get name() {
     return this.props.name
   }
@@ -50,9 +50,9 @@ export class User extends Entity<UserProps> {
     this.props.avatarId = avatarId
   }
 
-  static create(props: UserProps, id?: UniqueEntityID) {
-    const user = new User(props, id)
+  static create(props: SellerProps, id?: UniqueEntityID) {
+    const seller = new Seller(props, id)
 
-    return user
+    return seller
   }
 }
