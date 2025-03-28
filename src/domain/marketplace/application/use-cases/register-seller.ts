@@ -3,18 +3,25 @@ import { SellerRepository } from '../repositories/seller-repository'
 import { Either, left, right } from '@/core/either'
 import { Seller } from '../../enterprise/entities/seller'
 import { HashGenerator } from '../cryptography/hash-generator'
-import { StudentAlreadyExistsError } from './errors/student-already-exists-error'
+import { EmailAlreadyExistsError } from './errors/email-already-exists-error'
+import { InvalidPasswordConfirmationError } from './errors/invalid-password-confirmation-error'
+import { PhoneAlreadyExistsError } from './errors/phone-already-exists-error'
+import { ResourceNotFoundError } from './errors/resource-not-found-error'
 
 interface RegisterSellerUseCaseRequest {
   name: string
   email: string
   phone: string
+  avatarId: string | null
   password: string
-  avatarId: string
+  passwordConfirmation: string
 }
 
 type RegisterSellerUseCaseResponse = Either<
-  StudentAlreadyExistsError,
+  | InvalidPasswordConfirmationError
+  | EmailAlreadyExistsError
+  | PhoneAlreadyExistsError
+  | ResourceNotFoundError,
   {
     seller: Seller
   }
@@ -23,7 +30,7 @@ type RegisterSellerUseCaseResponse = Either<
 @Injectable()
 export class RegisterSellerUseCase {
   constructor(
-    private sellerRepository: SellerRepository,
+    private sellersRepository: SellerRepository,
     private hashGenerator: HashGenerator,
   ) {}
 
@@ -31,19 +38,24 @@ export class RegisterSellerUseCase {
     name,
     email,
     phone,
-    password,
     avatarId,
+    password,
+    passwordConfirmation,
   }: RegisterSellerUseCaseRequest): Promise<RegisterSellerUseCaseResponse> {
-    const sellerWithSameEmail = await this.sellerRepository.findByEmail(email)
-
-    if (sellerWithSameEmail) {
-      return left(new StudentAlreadyExistsError(email))
+    if (password !== passwordConfirmation) {
+      return left(new InvalidPasswordConfirmationError())
     }
 
-    const sellerWithSamePhone = await this.sellerRepository.findByPhone(phone)
+    const sellerWithSameEmail = await this.sellersRepository.findByEmail(email)
+
+    if (sellerWithSameEmail) {
+      return left(new EmailAlreadyExistsError(email))
+    }
+
+    const sellerWithSamePhone = await this.sellersRepository.findByPhone(phone)
 
     if (sellerWithSamePhone) {
-      return left(new StudentAlreadyExistsError(phone))
+      return left(new PhoneAlreadyExistsError(phone))
     }
 
     const hashedPassword = await this.hashGenerator.hash(password)
@@ -52,11 +64,11 @@ export class RegisterSellerUseCase {
       name,
       email,
       phone,
-      password: hashedPassword,
       avatarId,
+      password: hashedPassword,
     })
 
-    await this.sellerRepository.create(seller)
+    await this.sellersRepository.create(seller)
 
     return right({ seller })
   }

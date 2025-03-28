@@ -5,8 +5,8 @@ export interface SellerProps {
   name: string
   email: string
   phone: string
+  avatarId: string | null
   password: string
-  avatarId: string
 }
 
 export class Seller extends Entity<SellerProps> {
@@ -27,7 +27,7 @@ export class Seller extends Entity<SellerProps> {
   }
 
   get avatarId() {
-    return this.props.avatarId
+    return this.props.avatarId ?? ''
   }
 
   set name(name: string) {

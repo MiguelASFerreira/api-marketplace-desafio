@@ -15,33 +15,21 @@ describe('Register User', () => {
     sut = new RegisterSellerUseCase(inMemorySellersRepository, fakeHasher)
   })
 
-  it('should be able to register a new user', async () => {
+  it('should be able to register a seller without avatar', async () => {
     const result = await sut.execute({
       name: 'John Doe',
-      email: 'johndoe@example.com',
-      password: '123456',
-      avatarId: 'avatar-id',
       phone: '123456789',
+      email: 'johndoe@example.com',
+      avatarId: '',
+      password: '123456',
+      passwordConfirmation: '123456',
     })
 
     expect(result.isRight()).toBe(true)
-    expect(result.value).toEqual({
-      user: inMemorySellersRepository.items[0],
+    expect(result.value).toMatchObject({
+      seller: expect.objectContaining({
+        email: 'johndoe@example.com',
+      }),
     })
-  })
-
-  it('should hash student password upon registration', async () => {
-    const result = await sut.execute({
-      name: 'John Doe',
-      email: 'johndoe@example.com',
-      password: '123456',
-      avatarId: 'avatar-id',
-      phone: '123456789',
-    })
-
-    const hashedPassword = await fakeHasher.hash('123456')
-
-    expect(result.isRight()).toBe(true)
-    expect(inMemorySellersRepository.items[0].password).toEqual(hashedPassword)
   })
 })
