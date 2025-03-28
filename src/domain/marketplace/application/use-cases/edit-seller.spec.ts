@@ -1,6 +1,6 @@
-import { InMemorySellersRepository } from 'test/repositories/in-memory-user-repository'
+import { InMemorySellersRepository } from 'test/repositories/in-memory-seller-repository'
 import { FakeHasher } from 'test/cryptography/fake-hasher'
-import { EditSellerUseCase } from './edit-user'
+import { EditSellerUseCase } from './edit-seller'
 import { makeSeller } from 'test/factories/make-seller'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 

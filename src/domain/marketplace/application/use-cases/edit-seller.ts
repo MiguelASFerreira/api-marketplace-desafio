@@ -3,8 +3,8 @@ import { SellerRepository } from '../repositories/seller-repository'
 import { Either, left, right } from '@/core/either'
 import { Seller } from '../../enterprise/entities/seller'
 import { HashGenerator } from '../cryptography/hash-generator'
-import { ResourceNotFoundError } from '@/core/errors/resource-not-found-error'
-import { NotAllowedError } from '@/core/errors/not-allowed-error'
+import { ResourceNotFoundError } from '@/domain/marketplace/application/use-cases/errors/resource-not-found-error'
+import { NotAllowedError } from '@/domain/marketplace/application/use-cases/errors/not-allowed-error'
 
 interface EditSellerUseCaseRequest {
   sellerId: string

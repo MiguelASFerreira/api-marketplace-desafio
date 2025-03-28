@@ -1,4 +1,4 @@
-import { InMemorySellersRepository } from 'test/repositories/in-memory-user-repository'
+import { InMemorySellersRepository } from 'test/repositories/in-memory-seller-repository'
 import { RegisterSellerUseCase } from './register-seller'
 import { FakeHasher } from 'test/cryptography/fake-hasher'
 
