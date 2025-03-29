@@ -10,8 +10,8 @@
   - [x] Deve ser feito o hash da senha do usuário
   - [x] Não deve ser possível atualizar para um e-mail duplicado
   - [x] Não deve ser possível atualizar para um telefone duplicado
-- [ ] Deve ser possível obter o token de autenticação
-  - [ ] Não deve ser possível se autenticar com credenciais incorretas
+- [x] Deve ser possível obter o token de autenticação
+  - [x] Não deve ser possível se autenticar com credenciais incorretas
 
 ## 📂 Uploads
 
