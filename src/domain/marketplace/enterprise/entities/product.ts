@@ -1,4 +1,4 @@
-import { Entity } from '@/core/entities/entity'
+import { AggregateRoot } from '@/core/entities/aggregate-root'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 import { Optional } from '@/core/types/optional'
 
@@ -18,7 +18,7 @@ export interface ProductProps {
   createdAt: Date
 }
 
-export class Product extends Entity<ProductProps> {
+export class Product extends AggregateRoot<ProductProps> {
   get title() {
     return this.props.title
   }

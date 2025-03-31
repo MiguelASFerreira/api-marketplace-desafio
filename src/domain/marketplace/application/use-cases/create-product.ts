@@ -1,8 +1,10 @@
-import { Either, right } from '@/core/either'
+import { Either, left, right } from '@/core/either'
 import { Injectable } from '@nestjs/common'
 import { ProductsRepository } from '../repositories/products-repository'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 import { Product } from '../../enterprise/entities/product'
+import { SellerRepository } from '../repositories/seller-repository'
+import { ResourceNotFoundError } from './errors/resource-not-found-error'
 
 interface CreateProductUseCaseRequest {
   title: string
@@ -13,7 +15,7 @@ interface CreateProductUseCaseRequest {
 }
 
 type CreateProductUseCaseResponse = Either<
-  null,
+  ResourceNotFoundError,
   {
     product: Product
   }
@@ -21,7 +23,10 @@ type CreateProductUseCaseResponse = Either<
 
 @Injectable()
 export class CreateProductUseCase {
-  constructor(private productsRepository: ProductsRepository) {}
+  constructor(
+    private sellersRepository: SellerRepository,
+    private productsRepository: ProductsRepository,
+  ) {}
 
   async execute({
     title,
@@ -30,6 +35,12 @@ export class CreateProductUseCase {
     ownerId,
     categoryId,
   }: CreateProductUseCaseRequest): Promise<CreateProductUseCaseResponse> {
+    const seller = await this.sellersRepository.findById(ownerId)
+
+    if (!seller) {
+      return left(new ResourceNotFoundError())
+    }
+
     const product = Product.create({
       title,
       description,
