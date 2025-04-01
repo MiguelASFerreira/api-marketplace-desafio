@@ -1,7 +1,7 @@
 import { Either, left, right } from '@/core/either'
 import { Injectable } from '@nestjs/common'
 import { ProductsRepository } from '../repositories/products-repository'
-import { Product } from '../../enterprise/entities/product'
+import { Product, ProductStatus } from '../../enterprise/entities/product'
 import { SellerRepository } from '../repositories/seller-repository'
 import { ResourceNotFoundError } from './errors/resource-not-found-error'
 import { NotAllowedError } from './errors/not-allowed-error'
@@ -52,6 +52,10 @@ export class EditProductUseCase {
     }
 
     if (seller.id.toString() !== product.ownerId.toString()) {
+      return left(new NotAllowedError())
+    }
+
+    if (product.status === ProductStatus.SOLD) {
       return left(new NotAllowedError())
     }
 

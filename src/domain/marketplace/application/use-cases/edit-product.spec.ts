@@ -6,6 +6,9 @@ import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 import { makeCategory } from 'test/factories/make-category'
 import { makeSeller } from 'test/factories/make-seller'
 import { makeProduct } from 'test/factories/make-product'
+import { ResourceNotFoundError } from './errors/resource-not-found-error'
+import { NotAllowedError } from './errors/not-allowed-error'
+import { ProductStatus } from '../../enterprise/entities/product'
 
 let inMemorySellersRepository: InMemorySellersRepository
 let inMemoryCategoriesRepository: InMemoryCategoriesRepository
@@ -65,5 +68,143 @@ describe('Edit Product', () => {
         categoryId: category2.id,
       }),
     })
+  })
+
+  it('should not be able to edit a product with a non-existent user', async () => {
+    const seller = makeSeller()
+    await inMemorySellersRepository.create(seller)
+
+    const category = makeCategory()
+    await inMemoryCategoriesRepository.create(category)
+
+    const product = makeProduct({
+      ownerId: seller.id,
+      categoryId: category.id,
+    })
+    await inMemoryProductsRepository.create(product)
+
+    const result = await sut.execute({
+      productId: product.id.toValue(),
+      ownerId: 'non-existent-user',
+      title: 'Produto editado',
+      description: 'Descriação editada',
+      priceInCents: 123,
+      categoryId: category.id.toValue(),
+    })
+
+    expect(result.isLeft()).toBe(true)
+    expect(result.value).toBeInstanceOf(ResourceNotFoundError)
+  })
+
+  it('should not be able to edit a product with a non-existent category', async () => {
+    const seller = makeSeller()
+    await inMemorySellersRepository.create(seller)
+
+    const category = makeCategory()
+    await inMemoryCategoriesRepository.create(category)
+
+    const product = makeProduct({
+      ownerId: seller.id,
+      categoryId: category.id,
+    })
+
+    await inMemoryProductsRepository.create(product)
+
+    const result = await sut.execute({
+      productId: product.id.toValue(),
+      ownerId: product.ownerId.toValue(),
+      title: 'Produto editado',
+      description: 'Descriação editada',
+      priceInCents: 123,
+      categoryId: 'non-existent-category',
+    })
+
+    expect(result.isLeft()).toBe(true)
+    expect(result.value).toBeInstanceOf(ResourceNotFoundError)
+  })
+
+  it('should not be able to edit a non-existent product', async () => {
+    const seller = makeSeller()
+    await inMemorySellersRepository.create(seller)
+
+    const category = makeCategory()
+    await inMemoryCategoriesRepository.create(category)
+
+    const product = makeProduct({
+      ownerId: seller.id,
+      categoryId: category.id,
+    })
+
+    await inMemoryProductsRepository.create(product)
+
+    const result = await sut.execute({
+      productId: 'non-existent product',
+      ownerId: product.ownerId.toValue(),
+      title: 'Produto editado',
+      description: 'Descriação editada',
+      priceInCents: 123,
+      categoryId: category.id.toValue(),
+    })
+
+    expect(result.isLeft()).toBe(true)
+    expect(result.value).toBeInstanceOf(ResourceNotFoundError)
+  })
+
+  it('should not be able to edit a product from another user', async () => {
+    const seller1 = makeSeller({}, new UniqueEntityID('owner-1'))
+    await inMemorySellersRepository.create(seller1)
+
+    const seller2 = makeSeller({}, new UniqueEntityID('owner-2'))
+    await inMemorySellersRepository.create(seller2)
+
+    const category = makeCategory()
+    await inMemoryCategoriesRepository.create(category)
+
+    const product = makeProduct({
+      ownerId: new UniqueEntityID('owner-2'),
+      categoryId: category.id,
+    })
+
+    await inMemoryProductsRepository.create(product)
+
+    const result = await sut.execute({
+      productId: product.id.toValue(),
+      ownerId: 'owner-1',
+      title: 'Produto editado',
+      description: 'Descriação editada',
+      priceInCents: 123,
+      categoryId: category.id.toValue(),
+    })
+
+    expect(result.isLeft()).toBe(true)
+    expect(result.value).toBeInstanceOf(NotAllowedError)
+  })
+
+  it('should not be able to edit a sold product', async () => {
+    const seller = makeSeller()
+    await inMemorySellersRepository.create(seller)
+
+    const category = makeCategory()
+    await inMemoryCategoriesRepository.create(category)
+
+    const product = makeProduct({
+      ownerId: seller.id,
+      categoryId: category.id,
+      status: ProductStatus.SOLD,
+    })
+
+    await inMemoryProductsRepository.create(product)
+
+    const result = await sut.execute({
+      productId: product.id.toValue(),
+      ownerId: product.ownerId.toValue(),
+      title: 'Produto editado',
+      description: 'Descriação editada',
+      priceInCents: 123,
+      categoryId: category.id.toValue(),
+    })
+
+    expect(result.isLeft()).toBe(true)
+    expect(result.value).toBeInstanceOf(NotAllowedError)
   })
 })
