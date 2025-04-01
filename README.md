@@ -30,11 +30,11 @@
   - [x] Não deve ser possível editar um Produto já vendido
 - [x] Deve ser possível obter dados de um Produto
   - [x] Qualquer usuário deve poder obter dados do Produto
-- [ ] Deve ser possível listar todos os produtos por ordem de criação (mais recente)
-  - [ ] Qualquer usuário deve poder obter a lista de produtos
-  - [ ] Deve ser possível realizar paginação pela lista de produtos
-  - [ ] Deve ser possível filtrar pelo Status
-  - [ ] Deve ser possível buscar pelo título ou pela descrição do produto
+- [x] Deve ser possível listar todos os produtos por ordem de criação (mais recente)
+  - [x] Qualquer usuário deve poder obter a lista de produtos
+  - [x] Deve ser possível realizar paginação pela lista de produtos
+  - [x] Deve ser possível filtrar pelo Status
+  - [x] Deve ser possível buscar pelo título ou pela descrição do produto
 - [ ] Deve ser possível listar todos os produtos de um usuário
   - [ ] Não deve ser possível listar os produtos de um usuário inexistente
   - [ ] Deve ser possível filtrar pelo Status
