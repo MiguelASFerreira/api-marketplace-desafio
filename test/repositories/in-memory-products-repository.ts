@@ -1,4 +1,7 @@
-import { ProductsRepository } from '@/domain/marketplace/application/repositories/products-repository'
+import {
+  ProductsRepository,
+  FindMany,
+} from '@/domain/marketplace/application/repositories/products-repository'
 import { Product } from '@/domain/marketplace/enterprise/entities/product'
 
 export class InMemoryProductsRepository implements ProductsRepository {
@@ -12,6 +15,30 @@ export class InMemoryProductsRepository implements ProductsRepository {
     }
 
     return product
+  }
+
+  async findMany({ page, search, status }: FindMany) {
+    let filteredProducts = this.items
+
+    if (search) {
+      filteredProducts = filteredProducts.filter(
+        (product) =>
+          product.title.includes(search) ||
+          product.description.includes(search),
+      )
+    }
+
+    if (status) {
+      filteredProducts = filteredProducts.filter(
+        (product) => product.status === status,
+      )
+    }
+
+    const products = filteredProducts
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .slice((page - 1) * 20, page * 20)
+
+    return products
   }
 
   async save(product: Product) {
