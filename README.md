@@ -24,12 +24,12 @@
   - [x] Deve ser possível armazenar o valor do produto em centavos
   - [x] Não deve ser possível criar/editar um Produto com um usuário inexistente
   - [x] Não deve ser possível criar/editar um Produto com uma categoria inexistente
-  - [ ] Não deve ser possível criar/editar um Produto com imagens inexistentes
+  - [ ] Não deve ser possível criar/editar um Produto com imagens inexistentes ⚠️
   - [x] Não deve ser possível editar um Produto inexistente
   - [x] Não deve ser possível alterar um Produto de outro usuário
   - [x] Não deve ser possível editar um Produto já vendido
-- [ ] Deve ser possível obter dados de um Produto
-  - [ ] Qualquer usuário deve poder obter dados do Produto
+- [x] Deve ser possível obter dados de um Produto
+  - [x] Qualquer usuário deve poder obter dados do Produto
 - [ ] Deve ser possível listar todos os produtos por ordem de criação (mais recente)
   - [ ] Qualquer usuário deve poder obter a lista de produtos
   - [ ] Deve ser possível realizar paginação pela lista de produtos
