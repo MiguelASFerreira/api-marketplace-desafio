@@ -49,7 +49,7 @@
 ## 🏷️ Categorias
 
 - [x] Deve ser possível listar todas as categorias
-  - [ ] Qualquer usuário deve poder obter a lista de categorias
+  - [x] Qualquer usuário deve poder obter a lista de categorias
 
 ## 👤 Perfil de Usuário
 
