@@ -1,6 +1,7 @@
 import { AggregateRoot } from '@/core/entities/aggregate-root'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 import { Optional } from '@/core/types/optional'
+import { ProductAttachmentList } from './product-attachment-list'
 
 export enum ProductStatus {
   AVAILABLE = 'available',
@@ -15,6 +16,7 @@ export interface ProductProps {
   status: ProductStatus
   ownerId: UniqueEntityID
   categoryId: UniqueEntityID
+  attachments: ProductAttachmentList
   createdAt: Date
 }
 
@@ -61,6 +63,14 @@ export class Product extends AggregateRoot<ProductProps> {
 
   set categoryId(categoryId: UniqueEntityID) {
     this.props.categoryId = categoryId
+  }
+
+  get attachments() {
+    return this.props.attachments
+  }
+
+  set attachments(attachments: ProductAttachmentList) {
+    this.props.attachments = attachments
   }
 
   get createdAt() {

@@ -4,6 +4,7 @@ import {
   Product,
   ProductProps,
 } from '@/domain/marketplace/enterprise/entities/product'
+import { ProductAttachmentList } from '@/domain/marketplace/enterprise/entities/product-attachment-list'
 
 export function makeProduct(
   override: Partial<ProductProps> = {},
@@ -16,6 +17,7 @@ export function makeProduct(
       priceInCents: faker.number.int(10),
       ownerId: new UniqueEntityID(),
       categoryId: new UniqueEntityID(),
+      attachments: new ProductAttachmentList(),
       ...override,
     },
     id,
