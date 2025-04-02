@@ -1,6 +1,7 @@
 import {
   ProductsRepository,
   FindMany,
+  FindManyByOwner,
 } from '@/domain/marketplace/application/repositories/products-repository'
 import { Product } from '@/domain/marketplace/enterprise/entities/product'
 
@@ -15,6 +16,34 @@ export class InMemoryProductsRepository implements ProductsRepository {
     }
 
     return product
+  }
+
+  async findManyByOwner({ ownerId, search, status }: FindManyByOwner) {
+    let filteredProducts = this.items
+
+    filteredProducts = filteredProducts.filter(
+      (product) => product.ownerId.toString() === ownerId,
+    )
+
+    if (search) {
+      filteredProducts = filteredProducts.filter(
+        (product) =>
+          product.title.includes(search) ||
+          product.description.includes(search),
+      )
+    }
+
+    if (status) {
+      filteredProducts = filteredProducts.filter(
+        (product) => product.status === status,
+      )
+    }
+
+    const products = filteredProducts.sort(
+      (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+    )
+
+    return products
   }
 
   async findMany({ page, search, status }: FindMany) {
