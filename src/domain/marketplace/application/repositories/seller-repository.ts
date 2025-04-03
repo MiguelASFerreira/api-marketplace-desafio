@@ -1,4 +1,4 @@
-import { Seller } from '../../enterprise/entities/seller'
+import { Seller } from '../../enterprise/entities/user/seller'
 
 export abstract class SellerRepository {
   abstract findById(id: string): Promise<Seller | null>

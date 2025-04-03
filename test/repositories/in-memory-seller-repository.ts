@@ -1,5 +1,5 @@
 import { SellerRepository } from '@/domain/marketplace/application/repositories/seller-repository'
-import { Seller } from '@/domain/marketplace/enterprise/entities/seller'
+import { Seller } from '@/domain/marketplace/enterprise/entities/user/seller'
 
 export class InMemorySellersRepository implements SellerRepository {
   public items: Seller[] = []

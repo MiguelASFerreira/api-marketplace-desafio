@@ -7,7 +7,9 @@ export interface FindMany<T> {
 }
 export type AsyncFindMany<T> = Promise<FindMany<T>>
 
-export interface AttachmentsRepository {
-  findManyByIds(ids: string[]): AsyncFindMany<Attachment>
-  createMany(attachments: Attachment[]): Promise<void>
+export abstract class AttachmentsRepository {
+  abstract findById(id: string): Promise<Attachment | null>
+  abstract findManyByIds(ids: string[]): AsyncFindMany<Attachment>
+  abstract create(attachment: Attachment): Promise<void>
+  abstract createMany(attachments: Attachment[]): Promise<void>
 }

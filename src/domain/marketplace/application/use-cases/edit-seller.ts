@@ -2,7 +2,7 @@
 import { Injectable } from '@nestjs/common'
 import { SellerRepository } from '../repositories/seller-repository'
 import { Either, left, right } from '@/core/either'
-import { Seller } from '../../enterprise/entities/seller'
+import { Seller } from '../../enterprise/entities/user/seller'
 import { HashGenerator } from '../cryptography/hash-generator'
 import { HashComparer } from '../cryptography/hash-comparer'
 import { EmailAlreadyExistsError } from './errors/email-already-exists-error'

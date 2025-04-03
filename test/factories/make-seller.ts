@@ -4,7 +4,8 @@ import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 import {
   Seller,
   SellerProps,
-} from '@/domain/marketplace/enterprise/entities/seller'
+} from '@/domain/marketplace/enterprise/entities/user/seller'
+import { UserAttachmentList } from '@/domain/marketplace/enterprise/entities/user/user-attachment-list'
 
 export function makeSeller(
   override: Partial<SellerProps> = {},
@@ -13,10 +14,10 @@ export function makeSeller(
   const seller = Seller.create(
     {
       name: faker.person.fullName(),
+      phone: faker.phone.number(),
       email: faker.internet.email(),
       password: faker.internet.password(),
-      avatarId: faker.string.uuid(),
-      phone: faker.phone.number(),
+      avatar: new UserAttachmentList(),
       ...override,
     },
     id,

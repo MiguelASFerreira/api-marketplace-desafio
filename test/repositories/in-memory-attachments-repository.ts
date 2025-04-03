@@ -4,6 +4,16 @@ import { Attachment } from '@/domain/marketplace/enterprise/entities/attachment'
 export class InMemoryAttachmentsRepository implements AttachmentsRepository {
   public items: Attachment[] = []
 
+  async findById(id: string) {
+    const attachment = this.items.find((item) => item.id.toString() === id)
+
+    if (!attachment) {
+      return null
+    }
+
+    return attachment
+  }
+
   async findManyByIds(ids: string[]) {
     const data: Attachment[] = []
     const inexistentIds: string[] = []
@@ -23,6 +33,10 @@ export class InMemoryAttachmentsRepository implements AttachmentsRepository {
       hasAll: inexistentIds.length === 0,
       inexistentIds,
     }
+  }
+
+  async create(attachment: Attachment) {
+    this.items.push(attachment)
   }
 
   async createMany(attachments: Attachment[]) {
