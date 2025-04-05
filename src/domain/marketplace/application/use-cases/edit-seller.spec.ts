@@ -5,18 +5,29 @@ import { makeSeller } from 'test/factories/make-seller'
 import { WrongCredentialsError } from './errors/wrong-credentials-error'
 import { PhoneAlreadyExistsError } from './errors/phone-already-exists-error'
 import { EmailAlreadyExistsError } from './errors/email-already-exists-error'
+import { InMemoryAttachmentsRepository } from 'test/repositories/in-memory-attachments-repository'
+import { InMemoryUserAttachmentsRepository } from 'test/repositories/in-memory-user-attachments-repository'
+import { ResourceNotFoundError } from './errors/resource-not-found-error'
+import { makeAttachment } from 'test/factories/make-attachment'
 
 let inMemorySellersRepository: InMemorySellersRepository
+let inMemoryAttachmentsRepository: InMemoryAttachmentsRepository
+let inMemoryUserAttachmentsRepository: InMemoryUserAttachmentsRepository
 let fakeHasher: FakeHasher
+
 let sut: EditSellerUseCase
 
 describe('Edit User', () => {
   beforeEach(() => {
     inMemorySellersRepository = new InMemorySellersRepository()
+    inMemoryAttachmentsRepository = new InMemoryAttachmentsRepository()
+    inMemoryUserAttachmentsRepository = new InMemoryUserAttachmentsRepository()
     fakeHasher = new FakeHasher()
 
     sut = new EditSellerUseCase(
       inMemorySellersRepository,
+      inMemoryAttachmentsRepository,
+      inMemoryUserAttachmentsRepository,
       fakeHasher,
       fakeHasher,
     )
@@ -38,6 +49,27 @@ describe('Edit User', () => {
       seller: expect.objectContaining({
         email: 'johndoe@example.com',
       }),
+    })
+  })
+
+  it('should be able to edit a seller avatar', async () => {
+    const seller = makeSeller()
+    await inMemorySellersRepository.create(seller)
+
+    const avatar = makeAttachment()
+    await inMemoryAttachmentsRepository.create(avatar)
+
+    const result = await sut.execute({
+      sellerId: seller.id.toString(),
+      name: seller.name,
+      phone: seller.phone,
+      email: seller.email,
+      avatarId: avatar.id.toString(),
+    })
+
+    expect(result.isRight()).toBe(true)
+    expect(result.value).toEqual({
+      seller: inMemorySellersRepository.items[0],
     })
   })
 
@@ -111,5 +143,21 @@ describe('Edit User', () => {
 
     expect(result.isLeft()).toBe(true)
     expect(result.value).toBeInstanceOf(PhoneAlreadyExistsError)
+  })
+
+  it('should not be able to edit a seller without a valid avatar', async () => {
+    const seller = makeSeller()
+    await inMemorySellersRepository.create(seller)
+
+    const result = await sut.execute({
+      sellerId: seller.id.toString(),
+      name: 'John Doe',
+      phone: '123456789',
+      email: 'johndoe@example.com',
+      avatarId: 'invalid-avatar',
+    })
+
+    expect(result.isLeft()).toBe(true)
+    expect(result.value).toBeInstanceOf(ResourceNotFoundError)
   })
 })

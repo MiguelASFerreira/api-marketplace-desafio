@@ -10,13 +10,18 @@ import { PhoneAlreadyExistsError } from './errors/phone-already-exists-error'
 import { ResourceNotFoundError } from './errors/resource-not-found-error'
 import { WrongCredentialsError } from './errors/wrong-credentials-error'
 import { InvalidNewPasswordError } from './errors/invalid-new-password-error'
+import { AttachmentsRepository } from '../repositories/attachments-repository'
+import { UserAttachmentsRepository } from '../repositories/user-attachments-repository'
+import { UserAttachmentList } from '../../enterprise/entities/user/user-attachment-list'
+import { UserAttachment } from '../../enterprise/entities/user/user-attachment'
+import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 
 interface EditSellerUseCaseRequest {
   sellerId: string
   name: string
   email: string
   phone: string
-  avatarId?: string | null
+  avatarId?: string
   password?: string
   newPassword?: string
 }
@@ -36,6 +41,8 @@ type EditSellerUseCaseResponse = Either<
 export class EditSellerUseCase {
   constructor(
     private sellersRepository: SellerRepository,
+    private attachmentsRepository: AttachmentsRepository,
+    private userAttachmentsRepository: UserAttachmentsRepository,
     private hashGenerator: HashGenerator,
     private hashComparer: HashComparer,
   ) {}
@@ -45,7 +52,7 @@ export class EditSellerUseCase {
     name,
     email,
     phone,
-    avatarId = null,
+    avatarId,
     password,
     newPassword,
   }: EditSellerUseCaseRequest): Promise<EditSellerUseCaseResponse> {
@@ -68,6 +75,30 @@ export class EditSellerUseCase {
       if (sellerWithSamePhone.id.toString() !== sellerId) {
         return left(new PhoneAlreadyExistsError(phone))
       }
+    }
+
+    if (avatarId) {
+      const avatar = await this.attachmentsRepository.findById(avatarId)
+
+      if (!avatar) {
+        return left(new ResourceNotFoundError())
+      }
+
+      const currentSellerAvatar =
+        await this.userAttachmentsRepository.findByUserId(sellerId)
+
+      const userAttachmentList = currentSellerAvatar
+        ? new UserAttachmentList([currentSellerAvatar])
+        : new UserAttachmentList()
+
+      const sellerAvatar = UserAttachment.create({
+        attachmentId: new UniqueEntityID(avatarId),
+        userId: seller.id,
+      })
+
+      userAttachmentList.update([sellerAvatar])
+
+      seller.avatar = userAttachmentList
     }
 
     if (newPassword) {
