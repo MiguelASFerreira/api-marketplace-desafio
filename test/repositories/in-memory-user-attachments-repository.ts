@@ -21,4 +21,10 @@ export class InMemoryUserAttachmentsRepository
   async create(attachment: UserAttachment) {
     this.items.push(attachment)
   }
+
+  async delete(attachment: UserAttachment) {
+    const itemIndex = this.items.findIndex((item) => item.id === attachment.id)
+
+    this.items.splice(itemIndex, 1)
+  }
 }
