@@ -55,7 +55,7 @@
 
 - [x] Deve ser possível obter informações do perfil de um usuário
   - [x] Não deve ser possível obter informações do perfil de um usuário inexistente
-  - [ ] Não deve ser possível obter a senha do usuário
+  - [x] Não deve ser possível obter a senha do usuário
 
 ## 👁️ Visualizações
 
