@@ -48,7 +48,6 @@ describe('Get Seller profile', () => {
       id: 'seller-1',
     })
 
-    console.log(result.value)
 
     expect(result.isRight()).toBe(true)
     expect(result.value).toMatchObject({
