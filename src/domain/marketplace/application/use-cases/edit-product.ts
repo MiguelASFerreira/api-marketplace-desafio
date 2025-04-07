@@ -6,6 +6,11 @@ import { SellerRepository } from '../repositories/seller-repository'
 import { ResourceNotFoundError } from './errors/resource-not-found-error'
 import { NotAllowedError } from './errors/not-allowed-error'
 import { CategoriesRepository } from '../repositories/categories-repository'
+import { AttachmentsRepository } from '../repositories/attachments-repository'
+import { ProductAttachmentsRepository } from '../repositories/product-attachments-repository'
+import { ProductAttachmentList } from '../../enterprise/entities/product-attachment-list'
+import { ProductAttachment } from '../../enterprise/entities/product-attachment'
+import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 
 interface EditProductUseCaseRequest {
   ownerId: string
@@ -14,6 +19,7 @@ interface EditProductUseCaseRequest {
   description: string
   priceInCents: number
   categoryId: string
+  attachmentsIds: string[]
 }
 
 type EditProductUseCaseResponse = Either<
@@ -29,6 +35,8 @@ export class EditProductUseCase {
     private sellersRepository: SellerRepository,
     private categoriesRepository: CategoriesRepository,
     private productsRepository: ProductsRepository,
+    private attachmentsRepository: AttachmentsRepository,
+    private productAttachmentsRepository: ProductAttachmentsRepository,
   ) {}
 
   async execute({
@@ -38,6 +46,7 @@ export class EditProductUseCase {
     description,
     priceInCents,
     categoryId,
+    attachmentsIds,
   }: EditProductUseCaseRequest): Promise<EditProductUseCaseResponse> {
     const seller = await this.sellersRepository.findById(ownerId)
 
@@ -65,10 +74,34 @@ export class EditProductUseCase {
       return left(new ResourceNotFoundError())
     }
 
+    const attachments =
+      await this.attachmentsRepository.findManyByIds(attachmentsIds)
+
+    if (!attachments.hasAll) {
+      return left(new ResourceNotFoundError())
+    }
+
+    const currentProductAttachments =
+      await this.productAttachmentsRepository.findManyByProductId(productId)
+
+    const productAttachmentList = new ProductAttachmentList(
+      currentProductAttachments,
+    )
+
+    const productAttachments = attachmentsIds.map((attachmentId) => {
+      return ProductAttachment.create({
+        attachmentId: new UniqueEntityID(attachmentId),
+        productId: product.id,
+      })
+    })
+
+    productAttachmentList.update(productAttachments)
+
     product.title = title
     product.description = description
     product.priceInCents = priceInCents
     product.categoryId = category.id
+    product.attachments = productAttachmentList
 
     await this.productsRepository.save(product)
 
