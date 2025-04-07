@@ -47,7 +47,6 @@ export class InMemorySellersRepository implements SellerRepository {
       name: seller.name,
       phone: seller.phone,
       email: seller.email,
-      password: seller.password,
       avatar,
     })
 

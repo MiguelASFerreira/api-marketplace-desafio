@@ -7,7 +7,7 @@ export interface UserWithAvatarProps {
   name: string
   phone: string
   email: string
-  password: string
+  password?: string
   avatar?: Attachment | null
 }
 
