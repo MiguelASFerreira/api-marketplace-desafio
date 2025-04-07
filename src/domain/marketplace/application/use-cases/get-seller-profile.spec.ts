@@ -48,7 +48,6 @@ describe('Get Seller profile', () => {
       id: 'seller-1',
     })
 
-
     expect(result.isRight()).toBe(true)
     expect(result.value).toMatchObject({
       seller: expect.objectContaining({
