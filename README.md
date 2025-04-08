@@ -15,7 +15,7 @@
 
 ## 📂 Uploads
 
-- [ ] Deve ser possível realizar o upload de arquivos
+- [x] Deve ser possível realizar o upload de arquivos
 
 
 ## 🛒 Produtos
