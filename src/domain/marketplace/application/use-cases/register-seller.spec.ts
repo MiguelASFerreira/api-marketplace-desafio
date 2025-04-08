@@ -8,7 +8,9 @@ import { makeSeller } from 'test/factories/make-seller'
 import { PhoneAlreadyExistsError } from './errors/phone-already-exists-error'
 import { ResourceNotFoundError } from './errors/resource-not-found-error'
 import { InvalidPasswordConfirmationError } from './errors/invalid-password-confirmation-error'
+import { InMemoryUserAttachmentsRepository } from 'test/repositories/in-memory-user-attachments-repository'
 
+let inMemoryUserAttachmentsRepository: InMemoryUserAttachmentsRepository
 let inMemorySellersRepository: InMemorySellersRepository
 let inMemoryAttachmentsRepository: InMemoryAttachmentsRepository
 let fakeHasher: FakeHasher
@@ -17,8 +19,12 @@ let sut: RegisterSellerUseCase
 
 describe('Register User', () => {
   beforeEach(() => {
-    inMemorySellersRepository = new InMemorySellersRepository()
+    inMemoryUserAttachmentsRepository = new InMemoryUserAttachmentsRepository()
     inMemoryAttachmentsRepository = new InMemoryAttachmentsRepository()
+    inMemorySellersRepository = new InMemorySellersRepository(
+      inMemoryUserAttachmentsRepository,
+      inMemoryAttachmentsRepository,
+    )
     fakeHasher = new FakeHasher()
 
     sut = new RegisterSellerUseCase(

@@ -19,9 +19,12 @@ let sut: EditSellerUseCase
 
 describe('Edit User', () => {
   beforeEach(() => {
-    inMemorySellersRepository = new InMemorySellersRepository()
     inMemoryAttachmentsRepository = new InMemoryAttachmentsRepository()
     inMemoryUserAttachmentsRepository = new InMemoryUserAttachmentsRepository()
+    inMemorySellersRepository = new InMemorySellersRepository(
+      inMemoryUserAttachmentsRepository,
+      inMemoryAttachmentsRepository,
+    )
     fakeHasher = new FakeHasher()
 
     sut = new EditSellerUseCase(

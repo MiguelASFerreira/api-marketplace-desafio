@@ -4,7 +4,11 @@ import { AuthenticateUseCase } from './authenticate-seller'
 import { FakeEncrypter } from 'test/cryptography/fake-encrypter'
 import { makeSeller } from 'test/factories/make-seller'
 import { WrongCredentialsError } from './errors/wrong-credentials-error'
+import { InMemoryAttachmentsRepository } from 'test/repositories/in-memory-attachments-repository'
+import { InMemoryUserAttachmentsRepository } from 'test/repositories/in-memory-user-attachments-repository'
 
+let inMemoryUserAttachmentsRepository: InMemoryUserAttachmentsRepository
+let inMemoryAttachmentsRepository: InMemoryAttachmentsRepository
 let inMemorySellersRepository: InMemorySellersRepository
 let fakeHasher: FakeHasher
 let fakeEncrypter: FakeEncrypter
@@ -12,7 +16,12 @@ let sut: AuthenticateUseCase
 
 describe('Authenticate Seller', () => {
   beforeEach(() => {
-    inMemorySellersRepository = new InMemorySellersRepository()
+    inMemoryUserAttachmentsRepository = new InMemoryUserAttachmentsRepository()
+    inMemoryAttachmentsRepository = new InMemoryAttachmentsRepository()
+    inMemorySellersRepository = new InMemorySellersRepository(
+      inMemoryUserAttachmentsRepository,
+      inMemoryAttachmentsRepository,
+    )
     fakeHasher = new FakeHasher()
     fakeEncrypter = new FakeEncrypter()
 

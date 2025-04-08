@@ -8,7 +8,9 @@ import { makeCategory } from 'test/factories/make-category'
 import { makeAttachment } from 'test/factories/make-attachment'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 import { ResourceNotFoundError } from './errors/resource-not-found-error'
+import { InMemoryUserAttachmentsRepository } from 'test/repositories/in-memory-user-attachments-repository'
 
+let inMemoryUserAttachmentsRepository: InMemoryUserAttachmentsRepository
 let inMemorySellersRepository: InMemorySellersRepository
 let inMemoryProductsRepository: InMemoryProductsRepository
 let inMemoryCategoriesRepository: InMemoryCategoriesRepository
@@ -17,10 +19,14 @@ let sut: CreateProductUseCase
 
 describe('Create Product', () => {
   beforeEach(() => {
-    inMemorySellersRepository = new InMemorySellersRepository()
+    inMemoryUserAttachmentsRepository = new InMemoryUserAttachmentsRepository()
     inMemoryProductsRepository = new InMemoryProductsRepository()
     inMemoryCategoriesRepository = new InMemoryCategoriesRepository()
     inMemoryAttachmentsRepository = new InMemoryAttachmentsRepository()
+    inMemorySellersRepository = new InMemorySellersRepository(
+      inMemoryUserAttachmentsRepository,
+      inMemoryAttachmentsRepository,
+    )
 
     sut = new CreateProductUseCase(
       inMemorySellersRepository,

@@ -7,14 +7,23 @@ import { makeSeller } from 'test/factories/make-seller'
 import { ProductStatus } from '../../enterprise/entities/product'
 import { ResourceNotFoundError } from './errors/resource-not-found-error'
 import { NotAllowedError } from './errors/not-allowed-error'
+import { InMemoryAttachmentsRepository } from 'test/repositories/in-memory-attachments-repository'
+import { InMemoryUserAttachmentsRepository } from 'test/repositories/in-memory-user-attachments-repository'
 
+let inMemoryUserAttachmentsRepository: InMemoryUserAttachmentsRepository
+let inMemoryAttachmentsRepository: InMemoryAttachmentsRepository
 let inMemorySellersRepository: InMemorySellersRepository
 let inMemoryProductsRepository: InMemoryProductsRepository
 let sut: ChangeProductStatusUseCase
 
 describe('Change Product status', () => {
   beforeEach(() => {
-    inMemorySellersRepository = new InMemorySellersRepository()
+    inMemoryUserAttachmentsRepository = new InMemoryUserAttachmentsRepository()
+    inMemoryAttachmentsRepository = new InMemoryAttachmentsRepository()
+    inMemorySellersRepository = new InMemorySellersRepository(
+      inMemoryUserAttachmentsRepository,
+      inMemoryAttachmentsRepository,
+    )
     inMemoryProductsRepository = new InMemoryProductsRepository()
 
     sut = new ChangeProductStatusUseCase(
