@@ -12,14 +12,18 @@ interface Upload {
 export class FakeUploader implements Uploader {
   public uploads: Upload[] = []
 
-  async upload({ fileName }: UploadParams): Promise<{ path: string }> {
-    const path = randomUUID()
+  async upload(params: UploadParams[]): Promise<{ paths: string[] }> {
+    const paths = params.map((file) => {
+      const path = `${randomUUID()}-${file.fileName}`
 
-    this.uploads.push({
-      fileName,
-      path,
+      this.uploads.push({
+        fileName: file.fileName,
+        path,
+      })
+
+      return path
     })
 
-    return { path }
+    return { paths }
   }
 }

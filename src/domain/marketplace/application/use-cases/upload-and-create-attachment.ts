@@ -13,7 +13,7 @@ interface UploadAndCreateAttachmentRequest {
 
 type UploadAndCreateAttachmentResponse = Either<
   InvalidAttachmentTypeError,
-  { attachment: Attachment }
+  { attachments: Attachment[] }
 >
 
 @Injectable()
@@ -23,25 +23,29 @@ export class UploadAndCreateAttachmentUseCase {
     private uploader: Uploader,
   ) {}
 
-  async execute({
-    fileName,
-    fileType,
-    body,
-  }: UploadAndCreateAttachmentRequest): Promise<UploadAndCreateAttachmentResponse> {
-    if (!/^image\/(png|jpe?g)$/.test(fileType)) {
-      return left(new InvalidAttachmentTypeError(fileType))
+  async execute(
+    files: UploadAndCreateAttachmentRequest[],
+  ): Promise<UploadAndCreateAttachmentResponse> {
+    for (const file of files) {
+      if (!/^image\/(png|jpe?g)$/.test(file.fileType)) {
+        return left(new InvalidAttachmentTypeError(file.fileType))
+      }
     }
 
-    const { path } = await this.uploader.upload({ fileName, fileType, body })
+    const { paths } = await this.uploader.upload(files)
 
-    const attachment = Attachment.create({
-      path,
+    const attachments = paths.map((path) => {
+      const attachment = Attachment.create({
+        path,
+      })
+
+      return attachment
     })
 
-    await this.attachmentsRepository.create(attachment)
+    await this.attachmentsRepository.createMany(attachments)
 
     return right({
-      attachment,
+      attachments,
     })
   }
 }
