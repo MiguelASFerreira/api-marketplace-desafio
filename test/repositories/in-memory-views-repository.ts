@@ -1,8 +1,25 @@
-import { ViewsRepository } from '@/domain/marketplace/application/repositories/views-repository'
+import {
+  ViewsRepository,
+  Count,
+} from '@/domain/marketplace/application/repositories/views-repository'
 import { View } from '@/domain/marketplace/enterprise/entities/view'
 
 export class InMemoryViewsRepository implements ViewsRepository {
   public items: View[] = []
+
+  async count({ sellerId, productId, from }: Count) {
+    let filteredViews = this.items
+
+    filteredViews = filteredViews.filter((view) => {
+      return (
+        (!productId || view.product.id.toString() === productId) &&
+        (!from || view.createdAt >= from) &&
+        view.product.ownerId.toString() === sellerId
+      )
+    })
+
+    return filteredViews.length
+  }
 
   async findById(id: string) {
     const view = this.items.find((item) => item.id.toString() === id)
