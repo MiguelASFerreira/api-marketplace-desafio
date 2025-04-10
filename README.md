@@ -71,7 +71,7 @@
 - [ ] Deve ser possível obter a métrica de produtos vendidos nos últimos 30 dias
 - [ ] Deve ser possível obter a métrica de produtos disponíveis nos últimos 30 dias
 - [x] Deve ser possível obter a métrica de visualizações nos últimos 30 dias
-- [ ] Deve ser possível obter a métrica de visualizações por dia dos últimos 30 dias
+- [x] Deve ser possível obter a métrica de visualizações por dia dos últimos 30 dias
 - [ ] Deve ser possível obter a métrica de visualizações de um produto nos últimos 7 dias
 
 ---
