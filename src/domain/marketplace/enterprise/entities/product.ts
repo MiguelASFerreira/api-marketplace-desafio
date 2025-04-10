@@ -18,6 +18,7 @@ export interface ProductProps {
   categoryId: UniqueEntityID
   attachments: ProductAttachmentList
   createdAt: Date
+  statusAt: Date
 }
 
 export class Product extends AggregateRoot<ProductProps> {
@@ -51,6 +52,8 @@ export class Product extends AggregateRoot<ProductProps> {
 
   set status(status: ProductStatus) {
     this.props.status = status
+
+    this.props.statusAt = new Date()
   }
 
   get ownerId() {
@@ -77,15 +80,24 @@ export class Product extends AggregateRoot<ProductProps> {
     return this.props.createdAt
   }
 
+  get statusAt() {
+    return this.props.statusAt
+  }
+
   static create(
-    props: Optional<ProductProps, 'status' | 'createdAt'>,
+    props: Optional<
+      ProductProps,
+      'status' | 'attachments' | 'createdAt' | 'statusAt'
+    >,
     id?: UniqueEntityID,
   ) {
     const product = new Product(
       {
         ...props,
+        attachments: props.attachments ?? new ProductAttachmentList(),
         createdAt: props.createdAt ?? new Date(),
         status: props.status ?? ProductStatus.AVAILABLE,
+        statusAt: props.statusAt ?? new Date(),
       },
       id,
     )

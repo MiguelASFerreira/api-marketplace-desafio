@@ -2,11 +2,31 @@ import {
   ProductsRepository,
   FindMany,
   FindManyByOwner,
+  type Count,
 } from '@/domain/marketplace/application/repositories/products-repository'
 import { Product } from '@/domain/marketplace/enterprise/entities/product'
+import { normalizeDate } from 'test/utils/normalizeDate'
 
 export class InMemoryProductsRepository implements ProductsRepository {
   public items: Product[] = []
+
+  async count({ sellerId, status, from }: Count) {
+    let filteredProducts = this.items
+
+    const normalizedFrom = from ? normalizeDate(from) : null
+
+    filteredProducts = filteredProducts.filter((product) => {
+      const productStatusAt = normalizeDate(product.statusAt)
+
+      return (
+        product.ownerId.toString() === sellerId &&
+        (!status || product.status.toString() === status) &&
+        (!from || productStatusAt >= normalizedFrom!)
+      )
+    })
+
+    return filteredProducts.length
+  }
 
   async findById(id: string) {
     const product = this.items.find((item) => item.id.toString() === id)
