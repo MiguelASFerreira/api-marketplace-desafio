@@ -21,6 +21,32 @@ export class InMemoryViewsRepository implements ViewsRepository {
     return filteredViews.length
   }
 
+  async countPerDay({ sellerId, from }: Count) {
+    let filteredViews = this.items
+
+    filteredViews = filteredViews.filter((view) => {
+      return (
+        (!from || view.createdAt >= from) &&
+        view.product.ownerId.toString() === sellerId
+      )
+    })
+
+    const counts = filteredViews.reduce((acc, view) => {
+      const dateKey = view.createdAt.toISOString().split('T')[0]
+
+      acc.set(dateKey, (acc.get(dateKey) || 0) + 1)
+
+      return acc
+    }, new Map<string, number>())
+
+    const viewsPerDay = Array.from(counts.entries()).map(([date, amount]) => ({
+      date: new Date(date),
+      amount,
+    }))
+
+    return viewsPerDay
+  }
+
   async findById(id: string) {
     const view = this.items.find((item) => item.id.toString() === id)
 
