@@ -1,7 +1,7 @@
 import { Either, left, right } from '@/core/either'
 import { Injectable } from '@nestjs/common'
 import { Product } from '../../enterprise/entities/product'
-import { SellerRepository } from '../repositories/seller-repository'
+import { SellersRepository } from '../repositories/sellers-repository'
 import { ProductsRepository } from '../repositories/products-repository'
 import { ResourceNotFoundError } from './errors/resource-not-found-error'
 
@@ -21,7 +21,7 @@ type FetchProductsByOwnerIdUseCaseResponse = Either<
 @Injectable()
 export class FetchProductsByOwnerIdUseCase {
   constructor(
-    private sellersRepository: SellerRepository,
+    private sellersRepository: SellersRepository,
     private productsRepository: ProductsRepository,
   ) {}
 

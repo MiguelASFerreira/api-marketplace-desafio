@@ -1,11 +1,11 @@
-import { SellerRepository } from '@/domain/marketplace/application/repositories/seller-repository'
+import { SellersRepository } from '@/domain/marketplace/application/repositories/sellers-repository'
 import { Attachment } from '@/domain/marketplace/enterprise/entities/attachment'
 import { Seller } from '@/domain/marketplace/enterprise/entities/user/seller'
 import { UserWithAvatar } from '@/domain/marketplace/enterprise/entities/value-objects/user-with-avatar'
 import { InMemoryUserAttachmentsRepository } from './in-memory-user-attachments-repository'
 import { InMemoryAttachmentsRepository } from './in-memory-attachments-repository'
 
-export class InMemorySellersRepository implements SellerRepository {
+export class InMemorySellersRepository implements SellersRepository {
   public items: Seller[] = []
 
   constructor(

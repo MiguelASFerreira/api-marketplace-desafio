@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { Either, left, right } from '@/core/either'
 import { ResourceNotFoundError } from './errors/resource-not-found-error'
 import { UserWithAvatar } from '../../enterprise/entities/value-objects/user-with-avatar'
-import { SellerRepository } from '../repositories/seller-repository'
+import { SellersRepository } from '../repositories/sellers-repository'
 
 interface GetSellerProfileUseCaseRequest {
   id: string
@@ -17,7 +17,7 @@ type GetSellerProfileUseCaseResponse = Either<
 
 @Injectable()
 export class GetSellerProfileUseCase {
-  constructor(private sellersRepository: SellerRepository) {}
+  constructor(private sellersRepository: SellersRepository) {}
 
   async execute({
     id,

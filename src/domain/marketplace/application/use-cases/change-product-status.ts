@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { SellerRepository } from '../repositories/seller-repository'
+import { SellersRepository } from '../repositories/sellers-repository'
 import { ProductsRepository } from '../repositories/products-repository'
 import { Either, left, right } from '@/core/either'
 import { Product, ProductStatus } from '../../enterprise/entities/product'
@@ -22,7 +22,7 @@ type ChangeProductStatusUseCaseResponse = Either<
 @Injectable()
 export class ChangeProductStatusUseCase {
   constructor(
-    private sellersRepository: SellerRepository,
+    private sellersRepository: SellersRepository,
     private productRepository: ProductsRepository,
   ) {}
 

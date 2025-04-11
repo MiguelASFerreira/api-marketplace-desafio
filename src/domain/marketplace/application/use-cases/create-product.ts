@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common'
 import { ProductsRepository } from '../repositories/products-repository'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 import { Product } from '../../enterprise/entities/product'
-import { SellerRepository } from '../repositories/seller-repository'
+import { SellersRepository } from '../repositories/sellers-repository'
 import { ResourceNotFoundError } from './errors/resource-not-found-error'
 import { CategoriesRepository } from '../repositories/categories-repository'
 import { AttachmentsRepository } from '../repositories/attachments-repository'
@@ -29,7 +29,7 @@ type CreateProductUseCaseResponse = Either<
 @Injectable()
 export class CreateProductUseCase {
   constructor(
-    private sellersRepository: SellerRepository,
+    private sellersRepository: SellersRepository,
     private productsRepository: ProductsRepository,
     private categoriesRepository: CategoriesRepository,
     private attachmentsRepository: AttachmentsRepository,

@@ -1,7 +1,7 @@
 import { Seller } from '../../enterprise/entities/user/seller'
 import { UserWithAvatar } from '../../enterprise/entities/value-objects/user-with-avatar'
 
-export abstract class SellerRepository {
+export abstract class SellersRepository {
   abstract findById(id: string): Promise<Seller | null>
   abstract findWithAvatarById(id: string): Promise<UserWithAvatar | null>
   abstract findByEmail(email: string): Promise<Seller | null>

@@ -2,7 +2,7 @@ import { Either, left, right } from '@/core/either'
 import { Injectable } from '@nestjs/common'
 import { ProductsRepository } from '../repositories/products-repository'
 import { Product, ProductStatus } from '../../enterprise/entities/product'
-import { SellerRepository } from '../repositories/seller-repository'
+import { SellersRepository } from '../repositories/sellers-repository'
 import { ResourceNotFoundError } from './errors/resource-not-found-error'
 import { NotAllowedError } from './errors/not-allowed-error'
 import { CategoriesRepository } from '../repositories/categories-repository'
@@ -32,7 +32,7 @@ type EditProductUseCaseResponse = Either<
 @Injectable()
 export class EditProductUseCase {
   constructor(
-    private sellersRepository: SellerRepository,
+    private sellersRepository: SellersRepository,
     private categoriesRepository: CategoriesRepository,
     private productsRepository: ProductsRepository,
     private attachmentsRepository: AttachmentsRepository,

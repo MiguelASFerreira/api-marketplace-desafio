@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { SellerRepository } from '../repositories/seller-repository'
+import { SellersRepository } from '../repositories/sellers-repository'
 import { Either, left, right } from '@/core/either'
 import { WrongCredentialsError } from './errors/wrong-credentials-error'
 import { HashComparer } from '../cryptography/hash-comparer'
@@ -20,7 +20,7 @@ type AuthenticateUseCaseResponse = Either<
 @Injectable()
 export class AuthenticateUseCase {
   constructor(
-    private sellersRepository: SellerRepository,
+    private sellersRepository: SellersRepository,
     private hashComparer: HashComparer,
     private encrypter: Encrypter,
   ) {}
