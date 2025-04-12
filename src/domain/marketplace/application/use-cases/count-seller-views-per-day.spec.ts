@@ -6,10 +6,21 @@ import { makeSeller } from 'test/factories/make-seller'
 import { ResourceNotFoundError } from './errors/resource-not-found-error'
 import { InMemoryAttachmentsRepository } from 'test/repositories/in-memory-attachments-repository'
 import { InMemoryUserAttachmentsRepository } from 'test/repositories/in-memory-user-attachments-repository'
+import { InMemoryCategoriesRepository } from 'test/repositories/in-memory-categories-repository'
+import { InMemoryProductAttachmentsRepository } from 'test/repositories/in-memory-product-attachments-repository'
+import { InMemoryProductsRepository } from 'test/repositories/in-memory-products-repository'
+import { InMemoryViewersRepository } from 'test/repositories/in-memory-viewers-repository'
+import { makeCategory } from 'test/factories/make-category'
+import { makeProduct } from 'test/factories/make-product'
+import { makeViewer } from 'test/factories/make-viewer'
 
 let inMemoryUserAttachmentsRepository: InMemoryUserAttachmentsRepository
 let inMemoryAttachmentsRepository: InMemoryAttachmentsRepository
 let inMemorySellersRepository: InMemorySellersRepository
+let inMemoryCategoriesRepository: InMemoryCategoriesRepository
+let inMemoryProductAttachmentsRepository: InMemoryProductAttachmentsRepository
+let inMemoryProductsRepository: InMemoryProductsRepository
+let inMemoryViewersRepository: InMemoryViewersRepository
 let inMemoryViewsRepository: InMemoryViewsRepository
 let sut: CountSellerViewsPerDayUseCase
 
@@ -21,7 +32,24 @@ describe('Count Seller Views per day', () => {
       inMemoryUserAttachmentsRepository,
       inMemoryAttachmentsRepository,
     )
-    inMemoryViewsRepository = new InMemoryViewsRepository()
+    inMemoryCategoriesRepository = new InMemoryCategoriesRepository()
+    inMemoryProductAttachmentsRepository =
+      new InMemoryProductAttachmentsRepository()
+    inMemoryProductsRepository = new InMemoryProductsRepository(
+      inMemoryProductAttachmentsRepository,
+      inMemoryUserAttachmentsRepository,
+      inMemorySellersRepository,
+      inMemoryCategoriesRepository,
+      inMemoryAttachmentsRepository,
+    )
+    inMemoryViewersRepository = new InMemoryViewersRepository(
+      inMemoryUserAttachmentsRepository,
+      inMemoryAttachmentsRepository,
+    )
+    inMemoryViewsRepository = new InMemoryViewsRepository(
+      inMemoryProductsRepository,
+      inMemoryViewersRepository,
+    )
     sut = new CountSellerViewsPerDayUseCase(
       inMemorySellersRepository,
       inMemoryViewsRepository,
@@ -29,32 +57,46 @@ describe('Count Seller Views per day', () => {
   })
 
   it('should be able to count the views per day received by the seller in the last 30 days', async () => {
-    const baseView = makeView({ createdAt: new Date('1900-01-01') })
-
-    const seller = makeSeller({}, baseView.product.ownerId)
+    const seller = makeSeller()
     await inMemorySellersRepository.create(seller)
 
-    const now = new Date()
+    const category = makeCategory()
+    await inMemoryCategoriesRepository.create(category)
+
+    const product = makeProduct({
+      ownerId: seller.id,
+      categoryId: category.id,
+    })
+    await inMemoryProductsRepository.create(product)
+
+    const viewer = makeViewer()
+    await inMemoryViewersRepository.create(viewer)
+
+    const baseView = makeView({
+      product,
+      viewer,
+      createdAt: new Date('1900-01-01'),
+    })
 
     for (let i = 1; i <= 50; i++) {
-      const fakerCreatedAt = new Date(
-        Date.UTC(now.getFullYear(), now.getMonth(), now.getDate() - i * 2),
-      )
+      const fakerCreatedAt = new Date()
+      fakerCreatedAt.setDate(fakerCreatedAt.getDate() - i * 2)
 
       const view = makeView({
         product: baseView.product,
+        viewer: baseView.viewer,
         createdAt: fakerCreatedAt,
       })
 
       await inMemoryViewsRepository.create(view)
     }
 
-    const thirtyDaysAgo = new Date(
-      Date.UTC(now.getFullYear(), now.getMonth(), now.getDate() - 30),
-    )
+    const thirtyDaysAgo = new Date()
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
 
     const oneMoreView = makeView({
       product: baseView.product,
+      viewer: baseView.viewer,
       createdAt: thirtyDaysAgo,
     })
     await inMemoryViewsRepository.create(oneMoreView)
@@ -70,7 +112,11 @@ describe('Count Seller Views per day', () => {
     expect(result.value).toMatchObject({
       viewsPerDay: expect.arrayContaining([
         expect.objectContaining({
-          date: thirtyDaysAgo,
+          date: new Date(
+            new Date(new Date(thirtyDaysAgo).setHours(0, 0, 0, 0))
+              .toISOString()
+              .split('T')[0],
+          ),
           amount: 2,
         }),
       ]),
@@ -78,9 +124,6 @@ describe('Count Seller Views per day', () => {
   })
 
   it('should not be able to count views of a non-existent seller', async () => {
-    const view = makeView()
-    await inMemoryViewsRepository.create(view)
-
     const result = await sut.execute({
       sellerId: 'seller-1',
     })

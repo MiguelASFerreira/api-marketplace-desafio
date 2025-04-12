@@ -13,6 +13,8 @@ import { InMemoryCategoriesRepository } from 'test/repositories/in-memory-catego
 import { InMemorySellersRepository } from 'test/repositories/in-memory-sellers-repository'
 import { InMemoryUserAttachmentsRepository } from 'test/repositories/in-memory-user-attachments-repository'
 import { InMemoryProductAttachmentsRepository } from 'test/repositories/in-memory-product-attachments-repository'
+import { makeCategory } from 'test/factories/make-category'
+import { makeSeller } from 'test/factories/make-seller'
 
 let inMemoryUserAttachmentsRepository: InMemoryUserAttachmentsRepository
 let inMemoryAttachmentsRepository: InMemoryAttachmentsRepository
@@ -42,8 +44,14 @@ describe('Register Product View', () => {
       inMemoryCategoriesRepository,
       inMemoryAttachmentsRepository,
     )
-    inMemoryViewersRepository = new InMemoryViewersRepository()
-    inMemoryViewsRepository = new InMemoryViewsRepository()
+    inMemoryViewersRepository = new InMemoryViewersRepository(
+      inMemoryUserAttachmentsRepository,
+      inMemoryAttachmentsRepository,
+    )
+    inMemoryViewsRepository = new InMemoryViewsRepository(
+      inMemoryProductsRepository,
+      inMemoryViewersRepository,
+    )
     sut = new RegisterProductViewUseCase(
       inMemoryProductsRepository,
       inMemoryViewersRepository,
@@ -52,7 +60,16 @@ describe('Register Product View', () => {
   })
 
   it('should be able to register a product view', async () => {
-    const product = makeProduct({ ownerId: new UniqueEntityID('user-1') })
+    const seller = makeSeller({}, new UniqueEntityID('user-1'))
+    await inMemorySellersRepository.create(seller)
+
+    const category = makeCategory()
+    await inMemoryCategoriesRepository.create(category)
+
+    const product = makeProduct({
+      ownerId: new UniqueEntityID('user-1'),
+      categoryId: category.id,
+    })
     await inMemoryProductsRepository.create(product)
 
     const viewer = makeViewer({}, new UniqueEntityID('user-2'))
@@ -65,8 +82,20 @@ describe('Register Product View', () => {
 
     expect(result.isRight()).toBe(true)
     expect(result.value).toMatchObject({
-      view: expect.objectContaining({
-        id: inMemoryViewsRepository.items[0].id,
+      product: expect.objectContaining({
+        title: product.title,
+        owner: expect.objectContaining({
+          userId: seller.id,
+          avatar: null,
+        }),
+        category: expect.objectContaining({
+          id: category.id,
+        }),
+        attachments: [],
+      }),
+      viewer: expect.objectContaining({
+        userId: viewer.id,
+        avatar: null,
       }),
     })
   })
@@ -85,7 +114,16 @@ describe('Register Product View', () => {
   })
 
   it('should not be able to register a product view with a non-existent user', async () => {
-    const product = makeProduct({ ownerId: new UniqueEntityID('user-1') })
+    const seller = makeSeller({}, new UniqueEntityID('user-1'))
+    await inMemorySellersRepository.create(seller)
+
+    const category = makeCategory()
+    await inMemoryCategoriesRepository.create(category)
+
+    const product = makeProduct({
+      ownerId: new UniqueEntityID('user-1'),
+      categoryId: category.id,
+    })
     await inMemoryProductsRepository.create(product)
 
     const result = await sut.execute({
@@ -98,7 +136,16 @@ describe('Register Product View', () => {
   })
 
   it('should not be able to register a product view with the product owner', async () => {
-    const product = makeProduct({ ownerId: new UniqueEntityID('user-1') })
+    const seller = makeSeller({}, new UniqueEntityID('user-1'))
+    await inMemorySellersRepository.create(seller)
+
+    const category = makeCategory()
+    await inMemoryCategoriesRepository.create(category)
+
+    const product = makeProduct({
+      ownerId: new UniqueEntityID('user-1'),
+      categoryId: category.id,
+    })
     await inMemoryProductsRepository.create(product)
 
     const viewer = makeViewer({}, new UniqueEntityID('user-1'))
@@ -114,7 +161,16 @@ describe('Register Product View', () => {
   })
 
   it('should not be able to register a duplicate product view', async () => {
-    const product = makeProduct({ ownerId: new UniqueEntityID('user-1') })
+    const seller = makeSeller({}, new UniqueEntityID('user-1'))
+    await inMemorySellersRepository.create(seller)
+
+    const category = makeCategory()
+    await inMemoryCategoriesRepository.create(category)
+
+    const product = makeProduct({
+      ownerId: new UniqueEntityID('user-1'),
+      categoryId: category.id,
+    })
     await inMemoryProductsRepository.create(product)
 
     const viewer = makeViewer({}, new UniqueEntityID('user-2'))

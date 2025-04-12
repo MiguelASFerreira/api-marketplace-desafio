@@ -9,6 +9,7 @@ import { InMemoryAttachmentsRepository } from 'test/repositories/in-memory-attac
 import { InMemorySellersRepository } from 'test/repositories/in-memory-sellers-repository'
 import { InMemoryProductAttachmentsRepository } from 'test/repositories/in-memory-product-attachments-repository'
 import { InMemoryCategoriesRepository } from 'test/repositories/in-memory-categories-repository'
+import { InMemoryViewersRepository } from 'test/repositories/in-memory-viewers-repository'
 import { makeViewer } from 'test/factories/make-viewer'
 import { makeCategory } from 'test/factories/make-category'
 import { makeSeller } from 'test/factories/make-seller'
@@ -19,6 +20,7 @@ let inMemorySellersRepository: InMemorySellersRepository
 let inMemoryCategoriesRepository: InMemoryCategoriesRepository
 let inMemoryProductAttachmentsRepository: InMemoryProductAttachmentsRepository
 let inMemoryProductsRepository: InMemoryProductsRepository
+let inMemoryViewersRepository: InMemoryViewersRepository
 let inMemoryViewsRepository: InMemoryViewsRepository
 let sut: CountProductViewsUseCase
 
@@ -47,7 +49,14 @@ describe('Count Product Views', () => {
       inMemoryCategoriesRepository,
       inMemoryAttachmentsRepository,
     )
-    inMemoryViewsRepository = new InMemoryViewsRepository()
+    inMemoryViewersRepository = new InMemoryViewersRepository(
+      inMemoryUserAttachmentsRepository,
+      inMemoryAttachmentsRepository,
+    )
+    inMemoryViewsRepository = new InMemoryViewsRepository(
+      inMemoryProductsRepository,
+      inMemoryViewersRepository,
+    )
     sut = new CountProductViewsUseCase(
       inMemoryProductsRepository,
       inMemoryViewsRepository,
@@ -68,7 +77,7 @@ describe('Count Product Views', () => {
     await inMemoryProductsRepository.create(product)
 
     const viewer = makeViewer()
-    // Create a viewer
+    await inMemoryViewersRepository.create(viewer)
 
     for (let i = 1; i <= 10; i++) {
       const fakerCreatedAt = new Date()
@@ -99,7 +108,22 @@ describe('Count Product Views', () => {
   })
 
   it('should not be able to count views of a non-existent product', async () => {
-    const view = makeView()
+    const seller = makeSeller()
+    await inMemorySellersRepository.create(seller)
+
+    const category = makeCategory()
+    await inMemoryCategoriesRepository.create(category)
+
+    const product = makeProduct({
+      ownerId: seller.id,
+      categoryId: category.id,
+    })
+    await inMemoryProductsRepository.create(product)
+
+    const viewer = makeViewer()
+    await inMemoryViewersRepository.create(viewer)
+
+    const view = makeView({ product, viewer })
     await inMemoryViewsRepository.create(view)
 
     const result = await sut.execute({
