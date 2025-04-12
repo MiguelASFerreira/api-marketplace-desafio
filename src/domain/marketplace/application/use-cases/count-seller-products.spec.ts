@@ -1,16 +1,21 @@
 import { CountSellerProductsUseCase } from './count-seller-products'
 import { InMemoryProductsRepository } from 'test/repositories/in-memory-products-repository'
 import { makeProduct } from 'test/factories/make-product'
-import { InMemorySellersRepository } from 'test/repositories/in-memory-seller-repository'
+import { InMemorySellersRepository } from 'test/repositories/in-memory-sellers-repository'
 import { makeSeller } from 'test/factories/make-seller'
 import { ProductStatus } from '../../enterprise/entities/product'
 import { ResourceNotFoundError } from './errors/resource-not-found-error'
 import { InMemoryAttachmentsRepository } from 'test/repositories/in-memory-attachments-repository'
 import { InMemoryUserAttachmentsRepository } from 'test/repositories/in-memory-user-attachments-repository'
+import { InMemoryCategoriesRepository } from 'test/repositories/in-memory-categories-repository'
+import { InMemoryProductAttachmentsRepository } from 'test/repositories/in-memory-product-attachments-repository'
+import { makeCategory } from 'test/factories/make-category'
 
 let inMemoryUserAttachmentsRepository: InMemoryUserAttachmentsRepository
 let inMemoryAttachmentsRepository: InMemoryAttachmentsRepository
 let inMemorySellersRepository: InMemorySellersRepository
+let inMemoryCategoriesRepository: InMemoryCategoriesRepository
+let inMemoryProductAttachmentsRepository: InMemoryProductAttachmentsRepository
 let inMemoryProductsRepository: InMemoryProductsRepository
 let sut: CountSellerProductsUseCase
 
@@ -22,7 +27,16 @@ describe('Count Seller Products', () => {
       inMemoryUserAttachmentsRepository,
       inMemoryAttachmentsRepository,
     )
-    inMemoryProductsRepository = new InMemoryProductsRepository()
+    inMemoryCategoriesRepository = new InMemoryCategoriesRepository()
+    inMemoryProductAttachmentsRepository =
+      new InMemoryProductAttachmentsRepository()
+    inMemoryProductsRepository = new InMemoryProductsRepository(
+      inMemoryProductAttachmentsRepository,
+      inMemoryUserAttachmentsRepository,
+      inMemorySellersRepository,
+      inMemoryCategoriesRepository,
+      inMemoryAttachmentsRepository,
+    )
     sut = new CountSellerProductsUseCase(
       inMemorySellersRepository,
       inMemoryProductsRepository,
@@ -33,12 +47,16 @@ describe('Count Seller Products', () => {
     const seller = makeSeller()
     await inMemorySellersRepository.create(seller)
 
+    const category = makeCategory()
+    await inMemoryCategoriesRepository.create(category)
+
     for (let i = 1; i <= 50; i++) {
       const fakerStatusAt = new Date()
       fakerStatusAt.setDate(fakerStatusAt.getDate() - i)
 
       const product = makeProduct({
         ownerId: seller.id,
+        categoryId: category.id,
         status: i % 2 === 0 ? ProductStatus.SOLD : ProductStatus.AVAILABLE,
         statusAt: fakerStatusAt,
       })
@@ -65,12 +83,16 @@ describe('Count Seller Products', () => {
     const seller = makeSeller()
     await inMemorySellersRepository.create(seller)
 
+    const category = makeCategory()
+    await inMemoryCategoriesRepository.create(category)
+
     for (let i = 1; i <= 50; i++) {
       const fakerStatusAt = new Date()
       fakerStatusAt.setDate(fakerStatusAt.getDate() - i)
 
       const product = makeProduct({
         ownerId: seller.id,
+        categoryId: category.id,
         status: i % 2 === 0 ? ProductStatus.SOLD : ProductStatus.AVAILABLE,
         statusAt: fakerStatusAt,
       })
@@ -94,7 +116,16 @@ describe('Count Seller Products', () => {
   })
 
   it('should not be able to count products of a non-existent seller', async () => {
-    const product = makeProduct()
+    const seller = makeSeller()
+    await inMemorySellersRepository.create(seller)
+
+    const category = makeCategory()
+    await inMemoryCategoriesRepository.create(category)
+
+    const product = makeProduct({
+      ownerId: seller.id,
+      categoryId: category.id,
+    })
     await inMemoryProductsRepository.create(product)
 
     const result = await sut.execute({

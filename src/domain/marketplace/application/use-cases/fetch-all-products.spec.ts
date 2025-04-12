@@ -2,25 +2,70 @@ import { InMemoryProductsRepository } from 'test/repositories/in-memory-products
 import { makeProduct } from 'test/factories/make-product'
 import { FetchAllProductsUseCase } from './fetch-all-products'
 import { ProductStatus } from '../../enterprise/entities/product'
+import { InMemoryProductAttachmentsRepository } from 'test/repositories/in-memory-product-attachments-repository'
+import { InMemoryCategoriesRepository } from 'test/repositories/in-memory-categories-repository'
+import { InMemorySellersRepository } from 'test/repositories/in-memory-sellers-repository'
+import { InMemoryAttachmentsRepository } from 'test/repositories/in-memory-attachments-repository'
+import { InMemoryUserAttachmentsRepository } from 'test/repositories/in-memory-user-attachments-repository'
+import { makeCategory } from 'test/factories/make-category'
+import { makeSeller } from 'test/factories/make-seller'
 
+let inMemoryUserAttachmentsRepository: InMemoryUserAttachmentsRepository
+let inMemoryAttachmentsRepository: InMemoryAttachmentsRepository
+let inMemorySellersRepository: InMemorySellersRepository
+let inMemoryCategoriesRepository: InMemoryCategoriesRepository
+let inMemoryProductAttachmentsRepository: InMemoryProductAttachmentsRepository
 let inMemoryProductsRepository: InMemoryProductsRepository
 let sut: FetchAllProductsUseCase
 
 describe('Fetch All Products', () => {
   beforeEach(() => {
-    inMemoryProductsRepository = new InMemoryProductsRepository()
+    inMemoryUserAttachmentsRepository = new InMemoryUserAttachmentsRepository()
+    inMemoryAttachmentsRepository = new InMemoryAttachmentsRepository()
+    inMemorySellersRepository = new InMemorySellersRepository(
+      inMemoryUserAttachmentsRepository,
+      inMemoryAttachmentsRepository,
+    )
+    inMemoryCategoriesRepository = new InMemoryCategoriesRepository()
+    inMemoryProductAttachmentsRepository =
+      new InMemoryProductAttachmentsRepository()
+    inMemoryProductsRepository = new InMemoryProductsRepository(
+      inMemoryProductAttachmentsRepository,
+      inMemoryUserAttachmentsRepository,
+      inMemorySellersRepository,
+      inMemoryCategoriesRepository,
+      inMemoryAttachmentsRepository,
+    )
     sut = new FetchAllProductsUseCase(inMemoryProductsRepository)
   })
 
   it('should be able to fetch all products', async () => {
+    const seller = makeSeller()
+    await inMemorySellersRepository.create(seller)
+
+    const category = makeCategory()
+    await inMemoryCategoriesRepository.create(category)
+
     await inMemoryProductsRepository.create(
-      makeProduct({ createdAt: new Date(2024, 11, 20) }),
+      makeProduct({
+        ownerId: seller.id,
+        categoryId: category.id,
+        createdAt: new Date(2024, 11, 20),
+      }),
     )
     await inMemoryProductsRepository.create(
-      makeProduct({ createdAt: new Date(2024, 11, 18) }),
+      makeProduct({
+        ownerId: seller.id,
+        categoryId: category.id,
+        createdAt: new Date(2024, 11, 18),
+      }),
     )
     await inMemoryProductsRepository.create(
-      makeProduct({ createdAt: new Date(2024, 11, 23) }),
+      makeProduct({
+        ownerId: seller.id,
+        categoryId: category.id,
+        createdAt: new Date(2024, 11, 23),
+      }),
     )
 
     const result = await sut.execute({
@@ -36,8 +81,16 @@ describe('Fetch All Products', () => {
   })
 
   it('should be able to fetch paginated all products', async () => {
+    const seller = makeSeller()
+    await inMemorySellersRepository.create(seller)
+
+    const category = makeCategory()
+    await inMemoryCategoriesRepository.create(category)
+
     for (let i = 1; i <= 22; i++) {
-      await inMemoryProductsRepository.create(makeProduct())
+      await inMemoryProductsRepository.create(
+        makeProduct({ ownerId: seller.id, categoryId: category.id }),
+      )
     }
 
     const result = await sut.execute({
@@ -49,24 +102,36 @@ describe('Fetch All Products', () => {
   })
 
   it('should be able to fetch filtered products by title or description', async () => {
+    const seller = makeSeller()
+    await inMemorySellersRepository.create(seller)
+
+    const category = makeCategory()
+    await inMemoryCategoriesRepository.create(category)
+
     await inMemoryProductsRepository.create(
       makeProduct({
+        ownerId: seller.id,
         title: 'Produto 1',
         description: 'Descrição 123',
+        categoryId: category.id,
         createdAt: new Date(2024, 11, 20),
       }),
     )
     await inMemoryProductsRepository.create(
       makeProduct({
+        ownerId: seller.id,
         title: 'Produto 2',
         description: 'Descrição 456',
+        categoryId: category.id,
         createdAt: new Date(2024, 11, 18),
       }),
     )
     await inMemoryProductsRepository.create(
       makeProduct({
+        ownerId: seller.id,
         title: 'Produto 3',
         description: 'Descrição 789',
+        categoryId: category.id,
         createdAt: new Date(2024, 11, 23),
       }),
     )
@@ -92,20 +157,32 @@ describe('Fetch All Products', () => {
   })
 
   it('should be able to fetch filtered products by status', async () => {
+    const seller = makeSeller()
+    await inMemorySellersRepository.create(seller)
+
+    const category = makeCategory()
+    await inMemoryCategoriesRepository.create(category)
+
     await inMemoryProductsRepository.create(
       makeProduct({
+        ownerId: seller.id,
+        categoryId: category.id,
         status: ProductStatus.AVAILABLE,
         createdAt: new Date(2024, 11, 20),
       }),
     )
     await inMemoryProductsRepository.create(
       makeProduct({
+        ownerId: seller.id,
+        categoryId: category.id,
         status: ProductStatus.SOLD,
         createdAt: new Date(2024, 11, 18),
       }),
     )
     await inMemoryProductsRepository.create(
       makeProduct({
+        ownerId: seller.id,
+        categoryId: category.id,
         status: ProductStatus.AVAILABLE,
         createdAt: new Date(2024, 11, 23),
       }),
@@ -130,26 +207,38 @@ describe('Fetch All Products', () => {
   })
 
   it('should be able to fetch filtered products by title or description and status', async () => {
+    const seller = makeSeller()
+    await inMemorySellersRepository.create(seller)
+
+    const category = makeCategory()
+    await inMemoryCategoriesRepository.create(category)
+
     await inMemoryProductsRepository.create(
       makeProduct({
+        ownerId: seller.id,
         title: 'Produto 1',
         description: 'Descrição 123',
+        categoryId: category.id,
         status: ProductStatus.AVAILABLE,
         createdAt: new Date(2024, 11, 20),
       }),
     )
     await inMemoryProductsRepository.create(
       makeProduct({
+        ownerId: seller.id,
         title: 'Produto 2',
         description: 'Descrição 456',
+        categoryId: category.id,
         status: ProductStatus.SOLD,
         createdAt: new Date(2024, 11, 18),
       }),
     )
     await inMemoryProductsRepository.create(
       makeProduct({
+        ownerId: seller.id,
         title: 'Produto 3',
         description: 'Descrição 789',
+        categoryId: category.id,
         status: ProductStatus.CANCELLED,
         createdAt: new Date(2024, 11, 23),
       }),
@@ -166,6 +255,14 @@ describe('Fetch All Products', () => {
       expect.objectContaining({
         title: 'Produto 1',
         description: 'Descrição 123',
+        owner: expect.objectContaining({
+          userId: seller.id,
+          avatar: null,
+        }),
+        category: expect.objectContaining({
+          id: category.id,
+        }),
+        attachments: [],
         status: ProductStatus.AVAILABLE,
         createdAt: new Date(2024, 11, 20),
       }),

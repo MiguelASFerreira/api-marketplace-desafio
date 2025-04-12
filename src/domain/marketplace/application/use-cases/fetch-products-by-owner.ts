@@ -4,6 +4,7 @@ import { Product } from '../../enterprise/entities/product'
 import { SellersRepository } from '../repositories/sellers-repository'
 import { ProductsRepository } from '../repositories/products-repository'
 import { ResourceNotFoundError } from './errors/resource-not-found-error'
+import { ProductDetails } from '../../enterprise/entities/value-objects/product-details'
 
 interface FetchProductsByOwnerIdUseCaseRequest {
   ownerId: string
@@ -14,7 +15,7 @@ interface FetchProductsByOwnerIdUseCaseRequest {
 type FetchProductsByOwnerIdUseCaseResponse = Either<
   ResourceNotFoundError,
   {
-    products: Product[]
+    products: ProductDetails[]
   }
 >
 
@@ -36,7 +37,7 @@ export class FetchProductsByOwnerIdUseCase {
       return left(new ResourceNotFoundError())
     }
 
-    const products = await this.productsRepository.findManyByOwner({
+    const products = await this.productsRepository.findManyWithDetailsByOwner({
       ownerId,
       search,
       status,

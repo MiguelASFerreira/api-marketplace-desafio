@@ -1,4 +1,4 @@
-import { InMemorySellersRepository } from 'test/repositories/in-memory-seller-repository'
+import { InMemorySellersRepository } from 'test/repositories/in-memory-sellers-repository'
 import { InMemoryCategoriesRepository } from 'test/repositories/in-memory-categories-repository'
 import { InMemoryProductsRepository } from 'test/repositories/in-memory-products-repository'
 import { EditProductUseCase } from './edit-product'
@@ -29,7 +29,6 @@ describe('Edit Product', () => {
   beforeEach(() => {
     inMemoryUserAttachmentsRepository = new InMemoryUserAttachmentsRepository()
     inMemoryCategoriesRepository = new InMemoryCategoriesRepository()
-    inMemoryProductsRepository = new InMemoryProductsRepository()
     inMemoryAttachmentsRepository = new InMemoryAttachmentsRepository()
     inMemorySellersRepository = new InMemorySellersRepository(
       inMemoryUserAttachmentsRepository,
@@ -37,6 +36,13 @@ describe('Edit Product', () => {
     )
     inMemoryProductAttachmentsRepository =
       new InMemoryProductAttachmentsRepository()
+    inMemoryProductsRepository = new InMemoryProductsRepository(
+      inMemoryProductAttachmentsRepository,
+      inMemoryUserAttachmentsRepository,
+      inMemorySellersRepository,
+      inMemoryCategoriesRepository,
+      inMemoryAttachmentsRepository,
+    )
 
     sut = new EditProductUseCase(
       inMemorySellersRepository,
@@ -64,17 +70,19 @@ describe('Edit Product', () => {
       productId: new UniqueEntityID('product-1'),
     })
 
-    await inMemoryProductAttachmentsRepository.createMany([
-      productAttachmet1,
-      productAttachmet2,
-    ])
-
     const seller = makeSeller()
     await inMemorySellersRepository.create(seller)
+
+    const category1 = makeCategory()
+    await inMemoryCategoriesRepository.create(category1)
+
+    const category2 = makeCategory()
+    await inMemoryCategoriesRepository.create(category2)
 
     const product = makeProduct(
       {
         ownerId: seller.id,
+        categoryId: category1.id,
         attachments: new ProductAttachmentList([
           productAttachmet1,
           productAttachmet2,
@@ -85,36 +93,39 @@ describe('Edit Product', () => {
 
     await inMemoryProductsRepository.create(product)
 
-    const category = makeCategory()
-    await inMemoryCategoriesRepository.create(category)
-
     const result = await sut.execute({
-      ownerId: product.ownerId.toValue(),
       productId: product.id.toValue(),
+      ownerId: product.ownerId.toValue(),
       title: 'Produto editado',
       description: 'Descriação editada',
       priceInCents: 123,
-      categoryId: category.id.toValue(),
+      categoryId: category2.id.toValue(),
       attachmentsIds: ['1', '3'],
     })
 
     expect(result.isRight()).toBe(true)
-    expect(inMemoryProductsRepository.items[0]).toMatchObject({
-      title: 'Produto editado',
-      description: 'Descriação editada',
-      priceInCents: 123,
-      ownerId: seller.id,
-      categoryId: category.id,
+    expect(result.value).toMatchObject({
+      product: expect.objectContaining({
+        title: 'Produto editado',
+        description: 'Descriação editada',
+        priceInCents: 123,
+        owner: expect.objectContaining({
+          userId: seller.id,
+          avatar: null,
+        }),
+        category: expect.objectContaining({
+          id: category2.id,
+        }),
+        attachments: [
+          expect.objectContaining({
+            id: new UniqueEntityID('1'),
+          }),
+          expect.objectContaining({
+            id: new UniqueEntityID('3'),
+          }),
+        ],
+      }),
     })
-    expect(
-      inMemoryProductsRepository.items[0].attachments.currentItems,
-    ).toHaveLength(2)
-    expect(
-      inMemoryProductsRepository.items[0].attachments.currentItems,
-    ).toEqual([
-      expect.objectContaining({ attachmentId: new UniqueEntityID('1') }),
-      expect.objectContaining({ attachmentId: new UniqueEntityID('3') }),
-    ])
   })
 
   it('should not be able to edit a product with a non-existent user', async () => {

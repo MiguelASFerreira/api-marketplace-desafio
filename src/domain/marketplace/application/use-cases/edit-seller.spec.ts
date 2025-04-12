@@ -1,4 +1,4 @@
-import { InMemorySellersRepository } from 'test/repositories/in-memory-seller-repository'
+import { InMemorySellersRepository } from 'test/repositories/in-memory-sellers-repository'
 import { FakeHasher } from 'test/cryptography/fake-hasher'
 import { EditSellerUseCase } from './edit-seller'
 import { makeSeller } from 'test/factories/make-seller'

@@ -4,14 +4,49 @@ import { makeView } from 'test/factories/make-view'
 import { InMemoryProductsRepository } from 'test/repositories/in-memory-products-repository'
 import { makeProduct } from 'test/factories/make-product'
 import { ResourceNotFoundError } from './errors/resource-not-found-error'
+import { InMemoryUserAttachmentsRepository } from 'test/repositories/in-memory-user-attachments-repository'
+import { InMemoryAttachmentsRepository } from 'test/repositories/in-memory-attachments-repository'
+import { InMemorySellersRepository } from 'test/repositories/in-memory-sellers-repository'
+import { InMemoryProductAttachmentsRepository } from 'test/repositories/in-memory-product-attachments-repository'
+import { InMemoryCategoriesRepository } from 'test/repositories/in-memory-categories-repository'
+import { makeViewer } from 'test/factories/make-viewer'
+import { makeCategory } from 'test/factories/make-category'
+import { makeSeller } from 'test/factories/make-seller'
 
+let inMemoryUserAttachmentsRepository: InMemoryUserAttachmentsRepository
+let inMemoryAttachmentsRepository: InMemoryAttachmentsRepository
+let inMemorySellersRepository: InMemorySellersRepository
+let inMemoryCategoriesRepository: InMemoryCategoriesRepository
+let inMemoryProductAttachmentsRepository: InMemoryProductAttachmentsRepository
 let inMemoryProductsRepository: InMemoryProductsRepository
 let inMemoryViewsRepository: InMemoryViewsRepository
 let sut: CountProductViewsUseCase
 
 describe('Count Product Views', () => {
   beforeEach(() => {
-    inMemoryProductsRepository = new InMemoryProductsRepository()
+    inMemoryUserAttachmentsRepository = new InMemoryUserAttachmentsRepository()
+    inMemoryAttachmentsRepository = new InMemoryAttachmentsRepository()
+    inMemorySellersRepository = new InMemorySellersRepository(
+      inMemoryUserAttachmentsRepository,
+      inMemoryAttachmentsRepository,
+    )
+    inMemoryCategoriesRepository = new InMemoryCategoriesRepository()
+    inMemoryProductAttachmentsRepository =
+      new InMemoryProductAttachmentsRepository()
+    inMemoryProductsRepository = new InMemoryProductsRepository(
+      inMemoryProductAttachmentsRepository,
+      inMemoryUserAttachmentsRepository,
+      inMemorySellersRepository,
+      inMemoryCategoriesRepository,
+      inMemoryAttachmentsRepository,
+    )
+    inMemoryProductsRepository = new InMemoryProductsRepository(
+      inMemoryProductAttachmentsRepository,
+      inMemoryUserAttachmentsRepository,
+      inMemorySellersRepository,
+      inMemoryCategoriesRepository,
+      inMemoryAttachmentsRepository,
+    )
     inMemoryViewsRepository = new InMemoryViewsRepository()
     sut = new CountProductViewsUseCase(
       inMemoryProductsRepository,
@@ -20,8 +55,20 @@ describe('Count Product Views', () => {
   })
 
   it('should be able to count the views received by the product in the last 7 days', async () => {
-    const product = makeProduct()
+    const seller = makeSeller()
+    await inMemorySellersRepository.create(seller)
+
+    const category = makeCategory()
+    await inMemoryCategoriesRepository.create(category)
+
+    const product = makeProduct({
+      ownerId: seller.id,
+      categoryId: category.id,
+    })
     await inMemoryProductsRepository.create(product)
+
+    const viewer = makeViewer()
+    // Create a viewer
 
     for (let i = 1; i <= 10; i++) {
       const fakerCreatedAt = new Date()
@@ -29,6 +76,7 @@ describe('Count Product Views', () => {
 
       const view = makeView({
         product,
+        viewer,
         createdAt: fakerCreatedAt,
       })
 

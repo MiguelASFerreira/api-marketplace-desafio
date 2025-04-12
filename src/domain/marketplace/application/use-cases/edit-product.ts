@@ -1,7 +1,7 @@
 import { Either, left, right } from '@/core/either'
 import { Injectable } from '@nestjs/common'
 import { ProductsRepository } from '../repositories/products-repository'
-import { Product, ProductStatus } from '../../enterprise/entities/product'
+import { ProductStatus } from '../../enterprise/entities/product'
 import { SellersRepository } from '../repositories/sellers-repository'
 import { ResourceNotFoundError } from './errors/resource-not-found-error'
 import { NotAllowedError } from './errors/not-allowed-error'
@@ -11,6 +11,7 @@ import { ProductAttachmentsRepository } from '../repositories/product-attachment
 import { ProductAttachmentList } from '../../enterprise/entities/product-attachment-list'
 import { ProductAttachment } from '../../enterprise/entities/product-attachment'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id'
+import { ProductDetails } from '../../enterprise/entities/value-objects/product-details'
 
 interface EditProductUseCaseRequest {
   ownerId: string
@@ -25,7 +26,7 @@ interface EditProductUseCaseRequest {
 type EditProductUseCaseResponse = Either<
   ResourceNotFoundError | NotAllowedError,
   {
-    product: Product
+    product: ProductDetails
   }
 >
 
@@ -103,10 +104,10 @@ export class EditProductUseCase {
     product.categoryId = category.id
     product.attachments = productAttachmentList
 
-    await this.productsRepository.save(product)
+    const productWithDetails = await this.productsRepository.save(product)
 
     return right({
-      product,
+      product: productWithDetails,
     })
   }
 }

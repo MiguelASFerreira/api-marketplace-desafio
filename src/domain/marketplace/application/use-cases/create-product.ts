@@ -1,14 +1,15 @@
-import { Either, left, right } from '@/core/either'
-import { Injectable } from '@nestjs/common'
+import { Product } from '@/domain/marketplace/enterprise/entities/product'
 import { ProductsRepository } from '../repositories/products-repository'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id'
-import { Product } from '../../enterprise/entities/product'
 import { SellersRepository } from '../repositories/sellers-repository'
-import { ResourceNotFoundError } from './errors/resource-not-found-error'
 import { CategoriesRepository } from '../repositories/categories-repository'
-import { AttachmentsRepository } from '../repositories/attachments-repository'
-import { ProductAttachmentList } from '../../enterprise/entities/product-attachment-list'
+import { Either, left, right } from '@/core/either'
+import { ResourceNotFoundError } from './errors/resource-not-found-error'
 import { ProductAttachment } from '../../enterprise/entities/product-attachment'
+import { ProductAttachmentList } from '../../enterprise/entities/product-attachment-list'
+import { AttachmentsRepository } from '../repositories/attachments-repository'
+import { Injectable } from '@nestjs/common'
+import { ProductDetails } from '../../enterprise/entities/value-objects/product-details'
 
 interface CreateProductUseCaseRequest {
   title: string
@@ -22,7 +23,7 @@ interface CreateProductUseCaseRequest {
 type CreateProductUseCaseResponse = Either<
   ResourceNotFoundError,
   {
-    product: Product
+    product: ProductDetails
   }
 >
 
@@ -80,10 +81,10 @@ export class CreateProductUseCase {
 
     product.attachments = new ProductAttachmentList(productAttachments)
 
-    await this.productsRepository.create(product)
+    const productWithDetails = await this.productsRepository.create(product)
 
     return right({
-      product,
+      product: productWithDetails,
     })
   }
 }

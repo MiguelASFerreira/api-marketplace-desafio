@@ -1,5 +1,6 @@
 import { Product } from '../../enterprise/entities/product'
 import { PaginationParams } from '@/core/repositories/pagination-params'
+import { ProductDetails } from '../../enterprise/entities/value-objects/product-details'
 
 export interface Count {
   sellerId: string
@@ -20,8 +21,14 @@ export interface FindMany extends PaginationParams {
 export abstract class ProductsRepository {
   abstract count(params: Count): Promise<number>
   abstract findById(productId: string): Promise<Product | null>
+  abstract findDetailsById(id: string): Promise<ProductDetails | null>
   abstract findManyByOwner(params: FindManyByOwner): Promise<Product[]>
+  abstract findManyWithDetailsByOwner(
+    params: FindManyByOwner,
+  ): Promise<ProductDetails[]>
+
   abstract findMany(params: FindMany): Promise<Product[]>
-  abstract save(product: Product): Promise<void>
-  abstract create(product: Product): Promise<void>
+  abstract findManyWithDetails(params: FindMany): Promise<ProductDetails[]>
+  abstract save(product: Product): Promise<ProductDetails>
+  abstract create(product: Product): Promise<ProductDetails>
 }

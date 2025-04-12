@@ -2,9 +2,10 @@ import { Injectable } from '@nestjs/common'
 import { SellersRepository } from '../repositories/sellers-repository'
 import { ProductsRepository } from '../repositories/products-repository'
 import { Either, left, right } from '@/core/either'
-import { Product, ProductStatus } from '../../enterprise/entities/product'
+import { ProductStatus } from '../../enterprise/entities/product'
 import { ResourceNotFoundError } from './errors/resource-not-found-error'
 import { NotAllowedError } from './errors/not-allowed-error'
+import { ProductDetails } from '../../enterprise/entities/value-objects/product-details'
 
 interface ChangeProductStatusUseCaseRequest {
   productId: string
@@ -15,7 +16,7 @@ interface ChangeProductStatusUseCaseRequest {
 type ChangeProductStatusUseCaseResponse = Either<
   ResourceNotFoundError | NotAllowedError,
   {
-    product: Product
+    product: ProductDetails
   }
 >
 
@@ -63,10 +64,10 @@ export class ChangeProductStatusUseCase {
 
     product.status = newStatus
 
-    await this.productRepository.save(product)
+    const productWithDetails = await this.productRepository.save(product)
 
     return right({
-      product,
+      product: productWithDetails,
     })
   }
 }

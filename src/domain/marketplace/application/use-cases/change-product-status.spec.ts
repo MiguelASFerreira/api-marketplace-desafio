@@ -2,17 +2,22 @@ import { ChangeProductStatusUseCase } from './change-product-status'
 import { InMemoryProductsRepository } from 'test/repositories/in-memory-products-repository'
 import { makeProduct } from 'test/factories/make-product'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id'
-import { InMemorySellersRepository } from 'test/repositories/in-memory-seller-repository'
+import { InMemorySellersRepository } from 'test/repositories/in-memory-sellers-repository'
 import { makeSeller } from 'test/factories/make-seller'
 import { ProductStatus } from '../../enterprise/entities/product'
 import { ResourceNotFoundError } from './errors/resource-not-found-error'
 import { NotAllowedError } from './errors/not-allowed-error'
 import { InMemoryAttachmentsRepository } from 'test/repositories/in-memory-attachments-repository'
 import { InMemoryUserAttachmentsRepository } from 'test/repositories/in-memory-user-attachments-repository'
+import { InMemoryCategoriesRepository } from 'test/repositories/in-memory-categories-repository'
+import { InMemoryProductAttachmentsRepository } from 'test/repositories/in-memory-product-attachments-repository'
+import { makeCategory } from 'test/factories/make-category'
 
 let inMemoryUserAttachmentsRepository: InMemoryUserAttachmentsRepository
 let inMemoryAttachmentsRepository: InMemoryAttachmentsRepository
 let inMemorySellersRepository: InMemorySellersRepository
+let inMemoryCategoriesRepository: InMemoryCategoriesRepository
+let inMemoryProductAttachmentsRepository: InMemoryProductAttachmentsRepository
 let inMemoryProductsRepository: InMemoryProductsRepository
 let sut: ChangeProductStatusUseCase
 
@@ -24,7 +29,16 @@ describe('Change Product status', () => {
       inMemoryUserAttachmentsRepository,
       inMemoryAttachmentsRepository,
     )
-    inMemoryProductsRepository = new InMemoryProductsRepository()
+    inMemoryProductAttachmentsRepository =
+      new InMemoryProductAttachmentsRepository()
+    inMemoryCategoriesRepository = new InMemoryCategoriesRepository()
+    inMemoryProductsRepository = new InMemoryProductsRepository(
+      inMemoryProductAttachmentsRepository,
+      inMemoryUserAttachmentsRepository,
+      inMemorySellersRepository,
+      inMemoryCategoriesRepository,
+      inMemoryAttachmentsRepository,
+    )
 
     sut = new ChangeProductStatusUseCase(
       inMemorySellersRepository,
@@ -34,11 +48,14 @@ describe('Change Product status', () => {
 
   it('should be able to change a product status', async () => {
     const seller = makeSeller()
-
     await inMemorySellersRepository.create(seller)
+
+    const category = makeCategory()
+    await inMemoryCategoriesRepository.create(category)
 
     const product = makeProduct({
       ownerId: seller.id,
+      categoryId: category.id,
     })
 
     await inMemoryProductsRepository.create(product)
@@ -50,11 +67,32 @@ describe('Change Product status', () => {
     })
 
     expect(result.isRight()).toBe(true)
-    expect(inMemoryProductsRepository.items[0]).toEqual(result.value?.product)
+    expect(result.value).toMatchObject({
+      product: expect.objectContaining({
+        title: product.title,
+        owner: expect.objectContaining({
+          userId: seller.id,
+          avatar: null,
+        }),
+        category: expect.objectContaining({
+          id: category.id,
+        }),
+        attachments: [],
+      }),
+    })
   })
 
   it('should not be able to change a product status from a non-existent user', async () => {
-    const product = makeProduct()
+    const seller = makeSeller()
+    await inMemorySellersRepository.create(seller)
+
+    const category = makeCategory()
+    await inMemoryCategoriesRepository.create(category)
+
+    const product = makeProduct({
+      ownerId: seller.id,
+      categoryId: category.id,
+    })
 
     await inMemoryProductsRepository.create(product)
 
@@ -84,11 +122,18 @@ describe('Change Product status', () => {
   })
 
   it("should not be able to change the status of another user's product", async () => {
-    const seller = makeSeller({}, new UniqueEntityID('seller-1'))
-    await inMemorySellersRepository.create(seller)
+    const seller1 = makeSeller({}, new UniqueEntityID('seller-1'))
+    await inMemorySellersRepository.create(seller1)
+
+    const seller2 = makeSeller({}, new UniqueEntityID('seller-2'))
+    await inMemorySellersRepository.create(seller2)
+
+    const category = makeCategory()
+    await inMemoryCategoriesRepository.create(category)
 
     const product = makeProduct({
       ownerId: new UniqueEntityID('seller-2'),
+      categoryId: category.id,
     })
 
     await inMemoryProductsRepository.create(product)
@@ -105,11 +150,14 @@ describe('Change Product status', () => {
 
   it('should not be able to mark as cancelled a sold product', async () => {
     const seller = makeSeller()
-
     await inMemorySellersRepository.create(seller)
+
+    const category = makeCategory()
+    await inMemoryCategoriesRepository.create(category)
 
     const product = makeProduct({
       ownerId: seller.id,
+      categoryId: category.id,
       status: ProductStatus.SOLD,
     })
 
@@ -127,11 +175,14 @@ describe('Change Product status', () => {
 
   it('should not be able to mark as sold a cancelled product', async () => {
     const seller = makeSeller()
-
     await inMemorySellersRepository.create(seller)
+
+    const category = makeCategory()
+    await inMemoryCategoriesRepository.create(category)
 
     const product = makeProduct({
       ownerId: seller.id,
+      categoryId: category.id,
       status: ProductStatus.CANCELLED,
     })
 

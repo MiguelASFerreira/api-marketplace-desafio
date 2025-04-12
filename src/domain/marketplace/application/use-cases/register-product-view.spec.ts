@@ -8,7 +8,17 @@ import { makeViewer } from 'test/factories/make-viewer'
 import { makeView } from 'test/factories/make-view'
 import { ResourceNotFoundError } from './errors/resource-not-found-error'
 import { NotAllowedError } from './errors/not-allowed-error'
+import { InMemoryAttachmentsRepository } from 'test/repositories/in-memory-attachments-repository'
+import { InMemoryCategoriesRepository } from 'test/repositories/in-memory-categories-repository'
+import { InMemorySellersRepository } from 'test/repositories/in-memory-sellers-repository'
+import { InMemoryUserAttachmentsRepository } from 'test/repositories/in-memory-user-attachments-repository'
+import { InMemoryProductAttachmentsRepository } from 'test/repositories/in-memory-product-attachments-repository'
 
+let inMemoryUserAttachmentsRepository: InMemoryUserAttachmentsRepository
+let inMemoryAttachmentsRepository: InMemoryAttachmentsRepository
+let inMemorySellersRepository: InMemorySellersRepository
+let inMemoryCategoriesRepository: InMemoryCategoriesRepository
+let inMemoryProductAttachmentsRepository: InMemoryProductAttachmentsRepository
 let inMemoryProductsRepository: InMemoryProductsRepository
 let inMemoryViewersRepository: InMemoryViewersRepository
 let inMemoryViewsRepository: InMemoryViewsRepository
@@ -16,7 +26,22 @@ let sut: RegisterProductViewUseCase
 
 describe('Register Product View', () => {
   beforeEach(() => {
-    inMemoryProductsRepository = new InMemoryProductsRepository()
+    inMemoryUserAttachmentsRepository = new InMemoryUserAttachmentsRepository()
+    inMemoryAttachmentsRepository = new InMemoryAttachmentsRepository()
+    inMemorySellersRepository = new InMemorySellersRepository(
+      inMemoryUserAttachmentsRepository,
+      inMemoryAttachmentsRepository,
+    )
+    inMemoryCategoriesRepository = new InMemoryCategoriesRepository()
+    inMemoryProductAttachmentsRepository =
+      new InMemoryProductAttachmentsRepository()
+    inMemoryProductsRepository = new InMemoryProductsRepository(
+      inMemoryProductAttachmentsRepository,
+      inMemoryUserAttachmentsRepository,
+      inMemorySellersRepository,
+      inMemoryCategoriesRepository,
+      inMemoryAttachmentsRepository,
+    )
     inMemoryViewersRepository = new InMemoryViewersRepository()
     inMemoryViewsRepository = new InMemoryViewsRepository()
     sut = new RegisterProductViewUseCase(
@@ -39,8 +64,11 @@ describe('Register Product View', () => {
     })
 
     expect(result.isRight()).toBe(true)
-    expect(result.value?.view.id).toBeTruthy()
-    expect(inMemoryViewsRepository.items[0].id).toEqual(result.value?.view.id)
+    expect(result.value).toMatchObject({
+      view: expect.objectContaining({
+        id: inMemoryViewsRepository.items[0].id,
+      }),
+    })
   })
 
   it('should not be able to register a view on a non-existent product', async () => {

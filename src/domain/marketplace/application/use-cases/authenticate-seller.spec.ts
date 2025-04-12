@@ -1,5 +1,5 @@
 import { FakeHasher } from 'test/cryptography/fake-hasher'
-import { InMemorySellersRepository } from 'test/repositories/in-memory-seller-repository'
+import { InMemorySellersRepository } from 'test/repositories/in-memory-sellers-repository'
 import { AuthenticateUseCase } from './authenticate-seller'
 import { FakeEncrypter } from 'test/cryptography/fake-encrypter'
 import { makeSeller } from 'test/factories/make-seller'

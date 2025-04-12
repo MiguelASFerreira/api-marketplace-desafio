@@ -1,7 +1,7 @@
 import { CountSellerViewsUseCase } from './count-seller-views'
 import { InMemoryViewsRepository } from 'test/repositories/in-memory-views-repository'
 import { makeView } from 'test/factories/make-view'
-import { InMemorySellersRepository } from 'test/repositories/in-memory-seller-repository'
+import { InMemorySellersRepository } from 'test/repositories/in-memory-sellers-repository'
 import { makeSeller } from 'test/factories/make-seller'
 import { InMemoryAttachmentsRepository } from 'test/repositories/in-memory-attachments-repository'
 import { InMemoryUserAttachmentsRepository } from 'test/repositories/in-memory-user-attachments-repository'

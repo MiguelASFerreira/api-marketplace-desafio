@@ -3,6 +3,6 @@ import { ProductAttachment } from './product-attachment'
 
 export class ProductAttachmentList extends WatchedList<ProductAttachment> {
   compareItems(a: ProductAttachment, b: ProductAttachment): boolean {
-    return a.attachmentId === b.attachmentId
+    return a.attachmentId.equals(b.attachmentId)
   }
 }

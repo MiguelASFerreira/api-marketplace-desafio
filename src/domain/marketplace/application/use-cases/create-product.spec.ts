@@ -1,5 +1,5 @@
 import { CreateProductUseCase } from './create-product'
-import { InMemorySellersRepository } from 'test/repositories/in-memory-seller-repository'
+import { InMemorySellersRepository } from 'test/repositories/in-memory-sellers-repository'
 import { InMemoryProductsRepository } from 'test/repositories/in-memory-products-repository'
 import { makeSeller } from 'test/factories/make-seller'
 import { InMemoryCategoriesRepository } from 'test/repositories/in-memory-categories-repository'
@@ -9,8 +9,10 @@ import { makeAttachment } from 'test/factories/make-attachment'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 import { ResourceNotFoundError } from './errors/resource-not-found-error'
 import { InMemoryUserAttachmentsRepository } from 'test/repositories/in-memory-user-attachments-repository'
+import { InMemoryProductAttachmentsRepository } from 'test/repositories/in-memory-product-attachments-repository'
 
 let inMemoryUserAttachmentsRepository: InMemoryUserAttachmentsRepository
+let inMemoryProductAttachmentsRepository: InMemoryProductAttachmentsRepository
 let inMemorySellersRepository: InMemorySellersRepository
 let inMemoryProductsRepository: InMemoryProductsRepository
 let inMemoryCategoriesRepository: InMemoryCategoriesRepository
@@ -20,11 +22,19 @@ let sut: CreateProductUseCase
 describe('Create Product', () => {
   beforeEach(() => {
     inMemoryUserAttachmentsRepository = new InMemoryUserAttachmentsRepository()
-    inMemoryProductsRepository = new InMemoryProductsRepository()
     inMemoryCategoriesRepository = new InMemoryCategoriesRepository()
     inMemoryAttachmentsRepository = new InMemoryAttachmentsRepository()
     inMemorySellersRepository = new InMemorySellersRepository(
       inMemoryUserAttachmentsRepository,
+      inMemoryAttachmentsRepository,
+    )
+    inMemoryProductAttachmentsRepository =
+      new InMemoryProductAttachmentsRepository()
+    inMemoryProductsRepository = new InMemoryProductsRepository(
+      inMemoryProductAttachmentsRepository,
+      inMemoryUserAttachmentsRepository,
+      inMemorySellersRepository,
+      inMemoryCategoriesRepository,
       inMemoryAttachmentsRepository,
     )
 
@@ -60,19 +70,26 @@ describe('Create Product', () => {
     })
 
     expect(result.isRight()).toBe(true)
-    expect(result.value?.product.id).toBeTruthy()
-    expect(inMemoryProductsRepository.items[0].id).toEqual(
-      result.value?.product.id,
-    )
-    expect(
-      inMemoryProductsRepository.items[0].attachments.currentItems,
-    ).toHaveLength(2)
-    expect(
-      inMemoryProductsRepository.items[0].attachments.currentItems,
-    ).toEqual([
-      expect.objectContaining({ attachmentId: new UniqueEntityID('1') }),
-      expect.objectContaining({ attachmentId: new UniqueEntityID('2') }),
-    ])
+    expect(result.value).toMatchObject({
+      product: expect.objectContaining({
+        title: 'Novo produto',
+        owner: expect.objectContaining({
+          userId: seller.id,
+          avatar: null,
+        }),
+        category: expect.objectContaining({
+          id: category.id,
+        }),
+        attachments: [
+          expect.objectContaining({
+            id: new UniqueEntityID('1'),
+          }),
+          expect.objectContaining({
+            id: new UniqueEntityID('2'),
+          }),
+        ],
+      }),
+    })
   })
 
   it('should not be able to create a product with a non-existent user', async () => {

@@ -7,7 +7,7 @@ import { InMemoryAttachmentsRepository } from 'test/repositories/in-memory-attac
 import { makeAttachment } from 'test/factories/make-attachment'
 import { UserAttachmentList } from '../../enterprise/entities/user/user-attachment-list'
 import { makeUserAttachment } from 'test/factories/make-user-attachment'
-import { InMemorySellersRepository } from 'test/repositories/in-memory-seller-repository'
+import { InMemorySellersRepository } from 'test/repositories/in-memory-sellers-repository'
 
 let inMemoryUserAttachmentsRepository: InMemoryUserAttachmentsRepository
 let inMemoryAttachmentsRepository: InMemoryAttachmentsRepository

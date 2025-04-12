@@ -1,7 +1,7 @@
 import { CountSellerViewsPerDayUseCase } from './count-seller-views-per-day'
 import { InMemoryViewsRepository } from 'test/repositories/in-memory-views-repository'
 import { makeView } from 'test/factories/make-view'
-import { InMemorySellersRepository } from 'test/repositories/in-memory-seller-repository'
+import { InMemorySellersRepository } from 'test/repositories/in-memory-sellers-repository'
 import { makeSeller } from 'test/factories/make-seller'
 import { ResourceNotFoundError } from './errors/resource-not-found-error'
 import { InMemoryAttachmentsRepository } from 'test/repositories/in-memory-attachments-repository'
