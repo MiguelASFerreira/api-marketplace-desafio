@@ -18,7 +18,7 @@ model User {
   password String
   avatarId String? @map("avatar_id")
 
-  avatar   Attachment? @relation(fields: [avatarId], references: [id])
+  avatar   Attachment? @relation(name: "user_avatar")
   products Product[]   @relation(name: "product_owner")
   views    View[]
 
@@ -26,11 +26,13 @@ model User {
 }
 
 model Attachment {
-  id   String @id @default(uuid())
-  path String
+  id        String  @id @default(uuid())
+  path      String
+  userId    String? @unique @map("user_id")
+  productId String? @map("product_id")
 
-  users    User[]
-  products Product[]
+  user    User?    @relation(name: "user_avatar", fields: [userId], references: [id])
+  product Product? @relation(fields: [productId], references: [id])
 
   @@map("attachments")
 }
