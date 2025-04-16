@@ -37,9 +37,6 @@ describe('Register seller (E2E)', () => {
       passwordConfirmation: '123456',
     })
 
-    console.log(response.statusCode)
-    console.log(response.body)
-
     expect(response.statusCode).toBe(201)
     expect(response.body).toEqual({
       seller: expect.objectContaining({

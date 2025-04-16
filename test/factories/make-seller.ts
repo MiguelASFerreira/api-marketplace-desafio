@@ -6,6 +6,9 @@ import {
   SellerProps,
 } from '@/domain/marketplace/enterprise/entities/user/seller'
 import { UserAttachmentList } from '@/domain/marketplace/enterprise/entities/user/user-attachment-list'
+import { PrismaSellerMapper } from '@/infra/database/prisma/mappers/prisma-seller-mapper'
+import { Injectable } from '@nestjs/common'
+import { PrismaService } from '@/infra/database/prisma/prisma.service'
 
 export function makeSeller(
   override: Partial<SellerProps> = {},
@@ -24,4 +27,19 @@ export function makeSeller(
   )
 
   return seller
+}
+
+@Injectable()
+export class SellerFactory {
+  constructor(private prisma: PrismaService) {}
+
+  async makePrismaSeller(data: Partial<SellerProps> = {}): Promise<Seller> {
+    const seller = makeSeller(data)
+
+    await this.prisma.user.create({
+      data: PrismaSellerMapper.toPrisma(seller),
+    })
+
+    return seller
+  }
 }
