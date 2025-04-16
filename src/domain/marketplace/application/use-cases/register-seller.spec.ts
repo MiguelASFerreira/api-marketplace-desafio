@@ -45,8 +45,11 @@ describe('Register User', () => {
     })
 
     expect(result.isRight()).toBe(true)
-    expect(result.value).toEqual({
-      seller: inMemorySellersRepository.items[0],
+    expect(result.value).toMatchObject({
+      seller: expect.objectContaining({
+        email: 'johndoe@example.com',
+        avatar: null,
+      }),
     })
   })
 
@@ -65,8 +68,17 @@ describe('Register User', () => {
     })
 
     expect(result.isRight()).toBe(true)
-    expect(result.value).toEqual({
-      seller: inMemorySellersRepository.items[0],
+    expect(result.value).toMatchObject({
+      seller: expect.objectContaining({
+        email: 'johndoe@example.com',
+      }),
+    })
+    expect(result.value).toMatchObject({
+      seller: expect.objectContaining({
+        avatar: expect.objectContaining({
+          id: avatar.id,
+        }),
+      }),
     })
   })
 
