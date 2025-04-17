@@ -15,7 +15,7 @@ import { UserAttachmentsRepository } from '../repositories/user-attachments-repo
 import { UserAttachmentList } from '../../enterprise/entities/user/user-attachment-list'
 import { UserAttachment } from '../../enterprise/entities/user/user-attachment'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id'
-import type { UserWithAvatar } from '../../enterprise/entities/value-objects/user-with-avatar'
+import { UserWithAvatar } from '../../enterprise/entities/value-objects/user-with-avatar'
 
 interface EditSellerUseCaseRequest {
   sellerId: string

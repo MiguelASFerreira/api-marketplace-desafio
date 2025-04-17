@@ -1,5 +1,5 @@
 import { Entity } from '@/core/entities/entity'
-import type { UserAttachmentList } from './user-attachment-list'
+import { UserAttachmentList } from './user-attachment-list'
 
 export interface UserProps {
   name: string
