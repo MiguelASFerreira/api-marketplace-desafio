@@ -15,6 +15,7 @@ import { UserAttachmentsRepository } from '../repositories/user-attachments-repo
 import { UserAttachmentList } from '../../enterprise/entities/user/user-attachment-list'
 import { UserAttachment } from '../../enterprise/entities/user/user-attachment'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id'
+import type { UserWithAvatar } from '../../enterprise/entities/value-objects/user-with-avatar'
 
 interface EditSellerUseCaseRequest {
   sellerId: string
@@ -33,7 +34,7 @@ type EditSellerUseCaseResponse = Either<
   | InvalidNewPasswordError
   | WrongCredentialsError,
   {
-    seller: Seller
+    seller: UserWithAvatar
   }
 >
 
@@ -128,8 +129,8 @@ export class EditSellerUseCase {
     seller.phone = phone
     seller.email = email
 
-    await this.sellersRepository.save(seller)
+    const sellerWithAvatar = await this.sellersRepository.save(seller)
 
-    return right({ seller })
+    return right({ seller: sellerWithAvatar })
   }
 }

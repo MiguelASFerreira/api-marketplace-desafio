@@ -71,8 +71,13 @@ describe('Edit User', () => {
     })
 
     expect(result.isRight()).toBe(true)
-    expect(result.value).toEqual({
-      seller: inMemorySellersRepository.items[0],
+    expect(result.value).toMatchObject({
+      seller: expect.objectContaining({
+        email: seller.email,
+        avatar: expect.objectContaining({
+          id: avatar.id,
+        }),
+      }),
     })
   })
 

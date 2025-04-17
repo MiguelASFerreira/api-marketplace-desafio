@@ -5,10 +5,16 @@ import { RegisterSellerUseCase } from '@/domain/marketplace/application/use-case
 import { CryptographyModule } from '../cryptography/cryptography.module'
 import { AuthenticateSellerController } from './controllers/authenticate-seller.controller'
 import { AuthenticateUseCase } from '@/domain/marketplace/application/use-cases/authenticate-seller'
+import { EditSellerController } from './controllers/edit-seller.controller'
+import { EditSellerUseCase } from '@/domain/marketplace/application/use-cases/edit-seller'
 
 @Module({
   imports: [DatabaseModule, CryptographyModule],
-  controllers: [RegisterSellerController, AuthenticateSellerController],
-  providers: [RegisterSellerUseCase, AuthenticateUseCase],
+  controllers: [
+    RegisterSellerController,
+    AuthenticateSellerController,
+    EditSellerController,
+  ],
+  providers: [RegisterSellerUseCase, AuthenticateUseCase, EditSellerUseCase],
 })
 export class HttpModule {}
