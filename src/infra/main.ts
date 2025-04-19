@@ -4,7 +4,13 @@ import * as cookieParser from 'cookie-parser'
 import { EnvService } from './env/env.service'
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { cors: true })
+  const app = await NestFactory.create(AppModule)
+
+  app.enableCors({
+    origin: ['http://localhost:5173'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'HEAD', 'DELETE'],
+    credentials: true,
+  })
 
   const envService = app.get(EnvService)
 
