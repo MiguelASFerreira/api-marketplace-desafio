@@ -44,7 +44,7 @@ export class ChangeProductStatusUseCase {
       return left(new ResourceNotFoundError())
     }
 
-    if (seller.id !== product.ownerId) {
+    if (seller.id.toString() !== product.ownerId.toString()) {
       return left(new NotAllowedError())
     }
 
