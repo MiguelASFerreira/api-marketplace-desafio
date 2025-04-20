@@ -23,6 +23,7 @@ import { ChangeProductStatusController } from './controllers/change-product-stat
 import { ChangeProductStatusUseCase } from '@/domain/marketplace/application/use-cases/change-product-status'
 import { FetchAllCategoriesController } from './controllers/fetch-all-categories.controller'
 import { FetchAllCategoriesUseCase } from '@/domain/marketplace/application/use-cases/fetch-all-categories'
+import { SignOutController } from './controllers/sign-out.controller'
 
 @Module({
   imports: [DatabaseModule, CryptographyModule],
@@ -38,6 +39,7 @@ import { FetchAllCategoriesUseCase } from '@/domain/marketplace/application/use-
     FetchProductsByOwnerController,
     ChangeProductStatusController,
     FetchAllCategoriesController,
+    SignOutController,
   ],
   providers: [
     RegisterSellerUseCase,
