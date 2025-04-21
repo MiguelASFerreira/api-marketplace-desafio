@@ -45,7 +45,7 @@ export class ChangeProductStatusController {
 
     if (result.isLeft()) {
       const error = result.value
-      console.log('error', error)
+
       switch (error.constructor) {
         case NotAllowedError:
           throw new ForbiddenException(error.message)

@@ -49,8 +49,6 @@ describe('Upload attachment (E2E)', () => {
       .attach('files', attachmentPath)
       .attach('files', attachmentPath)
 
-    console.log(response)
-
     expect(response.statusCode).toBe(201)
     expect(response.body).toEqual({
       attachments: [

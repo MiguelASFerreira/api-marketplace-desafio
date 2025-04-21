@@ -27,6 +27,8 @@ import { SignOutController } from './controllers/sign-out.controller'
 import { UploadAttachmenstController } from './controllers/upload-attachments.controller'
 import { StorageModule } from '../storage/storage.module'
 import { UploadAndCreateAttachmentUseCase } from '@/domain/marketplace/application/use-cases/upload-and-create-attachment'
+import { RegisterProductViewController } from './controllers/register-product-view.controller'
+import { RegisterProductViewUseCase } from '@/domain/marketplace/application/use-cases/register-product-view'
 
 @Module({
   imports: [DatabaseModule, CryptographyModule, StorageModule],
@@ -44,6 +46,7 @@ import { UploadAndCreateAttachmentUseCase } from '@/domain/marketplace/applicati
     FetchAllCategoriesController,
     SignOutController,
     UploadAttachmenstController,
+    RegisterProductViewController,
   ],
   providers: [
     RegisterSellerUseCase,
@@ -58,6 +61,7 @@ import { UploadAndCreateAttachmentUseCase } from '@/domain/marketplace/applicati
     ChangeProductStatusUseCase,
     FetchAllCategoriesUseCase,
     UploadAndCreateAttachmentUseCase,
+    RegisterProductViewUseCase,
   ],
 })
 export class HttpModule {}

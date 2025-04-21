@@ -38,7 +38,6 @@ export class UploadAttachmenstController {
     )
     files: Express.Multer.File[],
   ) {
-    console.log('files', files)
     const filesToUpload = files.map((file) => {
       return {
         fileName: file.originalname,

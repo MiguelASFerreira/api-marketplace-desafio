@@ -6,6 +6,9 @@ import {
   ViewerProps,
 } from '@/domain/marketplace/enterprise/entities/user/viewer'
 import { UserAttachmentList } from '@/domain/marketplace/enterprise/entities/user/user-attachment-list'
+import { Injectable } from '@nestjs/common'
+import { PrismaService } from '@/infra/database/prisma/prisma.service'
+import { PrismaViewerMapper } from '@/infra/database/prisma/mappers/prisma-viewer-mapper'
 
 export function makeViewer(
   override: Partial<ViewerProps> = {},
@@ -24,4 +27,19 @@ export function makeViewer(
   )
 
   return viewer
+}
+
+@Injectable()
+export class ViewerFactory {
+  constructor(private prisma: PrismaService) {}
+
+  async makePrismaViewer(data: Partial<ViewerProps> = {}): Promise<Viewer> {
+    const viewer = makeViewer(data)
+
+    await this.prisma.user.create({
+      data: PrismaViewerMapper.toPrisma(viewer),
+    })
+
+    return viewer
+  }
 }
