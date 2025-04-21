@@ -27,7 +27,7 @@ export class UploadAndCreateAttachmentUseCase {
     files: UploadAndCreateAttachmentRequest[],
   ): Promise<UploadAndCreateAttachmentResponse> {
     for (const file of files) {
-      if (!/^image\/(png|jpe?g)$/.test(file.fileType)) {
+      if (!/^image\/(png|jpe?g|webp)$/.test(file.fileType)) {
         return left(new InvalidAttachmentTypeError(file.fileType))
       }
     }

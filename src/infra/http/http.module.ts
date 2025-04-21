@@ -24,9 +24,12 @@ import { ChangeProductStatusUseCase } from '@/domain/marketplace/application/use
 import { FetchAllCategoriesController } from './controllers/fetch-all-categories.controller'
 import { FetchAllCategoriesUseCase } from '@/domain/marketplace/application/use-cases/fetch-all-categories'
 import { SignOutController } from './controllers/sign-out.controller'
+import { UploadAttachmenstController } from './controllers/upload-attachments.controller'
+import { StorageModule } from '../storage/storage.module'
+import { UploadAndCreateAttachmentUseCase } from '@/domain/marketplace/application/use-cases/upload-and-create-attachment'
 
 @Module({
-  imports: [DatabaseModule, CryptographyModule],
+  imports: [DatabaseModule, CryptographyModule, StorageModule],
   controllers: [
     RegisterSellerController,
     AuthenticateSellerController,
@@ -40,6 +43,7 @@ import { SignOutController } from './controllers/sign-out.controller'
     ChangeProductStatusController,
     FetchAllCategoriesController,
     SignOutController,
+    UploadAttachmenstController,
   ],
   providers: [
     RegisterSellerUseCase,
@@ -53,6 +57,7 @@ import { SignOutController } from './controllers/sign-out.controller'
     FetchProductsByOwnerIdUseCase,
     ChangeProductStatusUseCase,
     FetchAllCategoriesUseCase,
+    UploadAndCreateAttachmentUseCase,
   ],
 })
 export class HttpModule {}
