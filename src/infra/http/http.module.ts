@@ -31,6 +31,8 @@ import { RegisterProductViewController } from './controllers/register-product-vi
 import { RegisterProductViewUseCase } from '@/domain/marketplace/application/use-cases/register-product-view'
 import { CountProductViewsInLast7DaysController } from './controllers/count-product-views-in-last-7-days.controller'
 import { CountProductViewsUseCase } from '@/domain/marketplace/application/use-cases/count-product-views'
+import { CountSellerProductsUseCase } from '@/domain/marketplace/application/use-cases/count-seller-products'
+import { CountProductsAvailableBySellerInLast30DaysController } from './controllers/count-products-available-by-seller-in-last-30-days.controller'
 
 @Module({
   imports: [DatabaseModule, CryptographyModule, StorageModule],
@@ -50,6 +52,7 @@ import { CountProductViewsUseCase } from '@/domain/marketplace/application/use-c
     UploadAttachmenstController,
     RegisterProductViewController,
     CountProductViewsInLast7DaysController,
+    CountProductsAvailableBySellerInLast30DaysController,
   ],
   providers: [
     RegisterSellerUseCase,
@@ -66,6 +69,7 @@ import { CountProductViewsUseCase } from '@/domain/marketplace/application/use-c
     UploadAndCreateAttachmentUseCase,
     RegisterProductViewUseCase,
     CountProductViewsUseCase,
+    CountSellerProductsUseCase,
   ],
 })
 export class HttpModule {}
