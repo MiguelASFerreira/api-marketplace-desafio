@@ -34,6 +34,8 @@ import { CountProductViewsUseCase } from '@/domain/marketplace/application/use-c
 import { CountSellerProductsUseCase } from '@/domain/marketplace/application/use-cases/count-seller-products'
 import { CountProductsAvailableBySellerInLast30DaysController } from './controllers/count-products-available-by-seller-in-last-30-days.controller'
 import { CountProductsSoldBySellerInLast30DaysController } from './controllers/count-products-sold-by-seller-in-last-30-days.controller'
+import { CountSellerViewsInLast30DaysController } from './controllers/count-seller-views-in-last-30-days.controller'
+import { CountSellerViewsUseCase } from '@/domain/marketplace/application/use-cases/count-seller-views'
 
 @Module({
   imports: [DatabaseModule, CryptographyModule, StorageModule],
@@ -55,6 +57,7 @@ import { CountProductsSoldBySellerInLast30DaysController } from './controllers/c
     CountProductViewsInLast7DaysController,
     CountProductsAvailableBySellerInLast30DaysController,
     CountProductsSoldBySellerInLast30DaysController,
+    CountSellerViewsInLast30DaysController,
   ],
   providers: [
     RegisterSellerUseCase,
@@ -72,6 +75,7 @@ import { CountProductsSoldBySellerInLast30DaysController } from './controllers/c
     RegisterProductViewUseCase,
     CountProductViewsUseCase,
     CountSellerProductsUseCase,
+    CountSellerViewsUseCase,
   ],
 })
 export class HttpModule {}
