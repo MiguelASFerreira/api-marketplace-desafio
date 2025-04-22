@@ -18,6 +18,8 @@ export class DiskStorage implements Uploader {
   }
 
   async upload(params: UploadParams[]): Promise<{ paths: string[] }> {
+    await fs.mkdir(this.uploadDir, { recursive: true })
+
     const paths = await Promise.all(
       params.map(async (file) => {
         const uploadId = randomUUID()
