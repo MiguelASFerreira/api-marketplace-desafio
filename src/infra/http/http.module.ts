@@ -33,6 +33,7 @@ import { CountProductViewsInLast7DaysController } from './controllers/count-prod
 import { CountProductViewsUseCase } from '@/domain/marketplace/application/use-cases/count-product-views'
 import { CountSellerProductsUseCase } from '@/domain/marketplace/application/use-cases/count-seller-products'
 import { CountProductsAvailableBySellerInLast30DaysController } from './controllers/count-products-available-by-seller-in-last-30-days.controller'
+import { CountProductsSoldBySellerInLast30DaysController } from './controllers/count-products-sold-by-seller-in-last-30-days.controller'
 
 @Module({
   imports: [DatabaseModule, CryptographyModule, StorageModule],
@@ -53,6 +54,7 @@ import { CountProductsAvailableBySellerInLast30DaysController } from './controll
     RegisterProductViewController,
     CountProductViewsInLast7DaysController,
     CountProductsAvailableBySellerInLast30DaysController,
+    CountProductsSoldBySellerInLast30DaysController,
   ],
   providers: [
     RegisterSellerUseCase,
